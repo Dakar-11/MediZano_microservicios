@@ -87,7 +87,8 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/actuator/health",
-                    "/actuator/info"
+                    "/actuator/info",
+                    "/actuator/prometheus"
                 ).permitAll()
                 .requestMatchers("/api/auth/logout").authenticated()
                 .requestMatchers("/api/admin/users/**").hasRole("ADMIN")
