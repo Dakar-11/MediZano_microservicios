@@ -11,6 +11,7 @@ Durante la exposición, mantén estas pestañas abiertas en el navegador del pre
 | Servicio / Herramienta | URL Directa Local | Función en la Demostración |
 | :--- | :---: | :--- |
 | 📖 **Portal de Documentación MkDocs** | [http://localhost:8000/medizano/](http://localhost:8000/medizano/) | Mostrar arquitectura C4, brief técnico y rúbrica oficial S12/S16. |
+| 🛒 **Frontend Web POS (Angular 17)** | [http://localhost:4200/](http://localhost:4200/) | Demostración visual de la compra en farmacia y emisión de ticket. |
 | 📑 **Swagger UI Centralizado (Gateway)** | [http://localhost:8090/swagger-ui.html](http://localhost:8090/swagger-ui.html) | Ejecución interactiva de endpoints y prueba de Bearer JWT. |
 | 🔭 **Eureka Service Discovery** | [http://localhost:8761/](http://localhost:8761/) | Evidenciar las 8 instancias de microservicios registradas dinámicamente. |
 | 📨 **Kafka UI (Kafbat)** | [http://localhost:18085/](http://localhost:18085/) | Inspección en tiempo real de los topics `orden-eventos` y `pago-eventos`. |
@@ -21,27 +22,21 @@ Durante la exposición, mantén estas pestañas abiertas en el navegador del pre
 
 ## ⏱️ Cronograma de Exposición (10 Minutos)
 
-```mermaid
-gantt
-    title Cronograma de Sustentación en Vivo (10 Minutos)
-    dateFormat  mm
-    axisFormat  %M:%S
-    section Inicio
-    Introducción & Arquitectura C4 (Kenyi) :00, 02m
-    section Demostración
-    Autenticación JWT & RBAC (Igarlos)     :02, 02m
-    Catálogo & FEFO Kardex (Aldo)          :04, 02m
-    Orden POS & Saga Kafka (Kenyi/Igarlos) :06, 02m
-    Facturación SUNAT & DIGEMID (Juan)     :08, 01m
-    section Cierre
-    Observabilidad & Preguntas (Todos)     :09, 01m
-```
+| Minuto | Integrante | Tema de Sustentación | Enfoque Técnico Evaluado |
+| :---: | :--- | :--- | :--- |
+| **00:00 - 02:00** | **Kenyi Calsin** | Introducción, Arquitectura C4 y Resiliencia | OpenFeign, Circuit Breaker Resilience4j, Database per Service. |
+| **02:00 - 04:00** | **Igarlos Mamani** | Seguridad JWT/RBAC y Mensajería Kafka | Token JWT asimétrico, Gateway perimetral, Consumidor Idempotente. |
+| **04:00 - 06:00** | **Aldo Calla** | Catálogo Farmacéutico e Inventario Kardex FEFO | Regla de dispensación FEFO, Lotes con vencimiento, Compensación Saga. |
+| **06:00 - 08:00** | **Juan Chambilla** | Facturación SUNAT, Comprobantes PDF y Proveedores | Desacople por eventos Kafka, Cálculo IGV 18%, iText PDF y DIGEMID. |
+| **08:00 - 10:00** | **Todo el Equipo** | Observabilidad (Grafana/Loki/Prometheus) & Preguntas | Trazabilidad con TraceID, Métricas Actuator y defensa ante el jurado. |
 
 ---
 
 ## 👥 Reparto Individual por Integrante (2 Microservicios c/u)
 
 Cumpliendo con la directiva oficial del sílabo (**1 microservicio transaccional cabecera-detalle + 1 microservicio no transaccional catálogo/maestro por persona**):
+
+---
 
 ### 1. Kenyi Calsin
 * **Microservicio Transaccional:** `orden-ms` (`:8082`) — Tablas: `ordenes`, `orden_detalles`.
@@ -50,6 +45,12 @@ Cumpliendo con la directiva oficial del sílabo (**1 microservicio transaccional
   - Orquestación de ventas POS y comunicación síncrona con `catalogo-ms` e `inventario-ms` mediante **OpenFeign**.
   - Resiliencia con **Resilience4j** (Circuit Breaker con fallback controlado ante caídas).
   - Emisión del evento asíncrono `orden.creada` hacia Apache Kafka.
+* **Evidencia en Pantalla:**
+  ![Frontend POS Web](../assets/images/medizano-frontend.png)
+* **Pregunta Clave:** *¿Qué evita que `orden-ms` se congele si `catalogo-ms` se cae?*
+  - **Respuesta:** El Circuit Breaker de Resilience4j corta la llamada tras 2 segundos y ejecuta el método de fallback controlado sin agotar los hilos de Tomcat.
+
+---
 
 ### 2. Aldo Calla
 * **Microservicio Transaccional:** `inventario-ms` (`:8085`) — Tablas: `movimientos_inventario`, `lotes`.
@@ -58,6 +59,12 @@ Cumpliendo con la directiva oficial del sílabo (**1 microservicio transaccional
   - Control de existencias bajo la regla farmacéutica **FEFO (First Expired, First Out)** para priorizar medicamentos próximos a caducar.
   - Gestión de movimientos Kardex (Entradas, Salidas, Ajustes y Devoluciones).
   - Compensación automática de stock si una orden es cancelada o el pago es rechazado.
+* **Evidencia en Pantalla:**
+  ![Eureka Discovery](../assets/images/eureka-discovery.png)
+* **Pregunta Clave:** *¿Por qué FEFO y no FIFO en farmacia?*
+  - **Respuesta:** Porque en farmacología la caducidad es crítica para evitar pérdidas y riesgos para el paciente. Se expende el lote cuya fecha de expiración es más inmediata.
+
+---
 
 ### 3. Igarlos Mamani
 * **Microservicio Transaccional:** `pago-ms` (`:8083`) — Tabla: `pagos` (`uk_pagos_orden`).
@@ -66,6 +73,12 @@ Cumpliendo con la directiva oficial del sílabo (**1 microservicio transaccional
   - Seguridad perimetral y distribuida: Emisión y validación de tokens **JWT asimétricos** con roles RBAC (`ROLE_ADMIN`, `ROLE_FARMACEUTICO`, `ROLE_CLIENTE`).
   - Consumidor Kafka idempotente en `pago-ms` para procesar el cobro sin duplicidad ante reintentos de red.
   - Integración con pasarelas de pago externas (PayPal Sandbox y Mercado Pago).
+* **Evidencia en Pantalla:**
+  ![Kafka UI Topics](../assets/images/kafka-ui.png)
+* **Pregunta Clave:** *¿Cómo garantizas que no se cobre dos veces una orden si Kafka reintenta el mensaje?*
+  - **Respuesta:** Mediante la restricción de base de datos `CONSTRAINT uk_pagos_orden UNIQUE (orden_id)`. Si llega un mensaje duplicado, se detecta antes de invocar la pasarela de pago.
+
+---
 
 ### 4. Juan Chambilla
 * **Microservicio Transaccional:** `facturacion-ms` (`:8086`) — Tablas: `facturas`, `factura_items`.
@@ -74,6 +87,16 @@ Cumpliendo con la directiva oficial del sílabo (**1 microservicio transaccional
   - Emisión fiscal electrónica de Boletas y Facturas cumpliendo la estructura SUNAT (cálculo de IGV 18%, montos gravados e inafectos).
   - Consumo del evento `pago.validado` para disparar la facturación de manera 100% desacoplada.
   - Gestión de laboratorios farmacéuticos y contratos de suministro homologados por DIGEMID.
+* **Evidencia en Pantalla:**
+  ![Swagger Gateway](../assets/images/swagger-gateway.png)
+* **Pregunta Clave:** *¿Por qué facturación no es síncrona en la caja registradora?*
+  - **Respuesta:** Para desacoplar la experiencia del cajero. La orden se cobra y se entrega; la emisión del comprobante SUNAT y la generación del PDF se ejecutan asíncronamente vía Kafka sin demorar la fila.
+
+---
+
+### 5. Suite de Observabilidad (Defensa Compartida)
+Paneles unificados en Grafana con métricas Prometheus y logs de Loki indexados por `traceId`:
+![Grafana Dashboard](../assets/images/grafana-dashboard.png)
 
 ---
 
@@ -92,11 +115,11 @@ sequenceDiagram
     participant Pago as pago-ms (:8083)
     participant Facturacion as facturacion-ms (:8086)
 
-    Cajero->>Gateway: POST /api/usuarios/login (Credenciales)
+    Cajero->>Gateway: POST /api/auth/login (admin / admin123)
     Gateway->>Auth: Valida BCrypt y genera JWT
     Auth-->>Cajero: Retorna Token Bearer JWT (ROLE_FARMACEUTICO)
 
-    Cajero->>Gateway: POST /api/ordenes (Crear Venta POS + Token)
+    Cajero->>Gateway: POST /api/v1/ordenes (Crear Venta POS + Token)
     Gateway->>Orden: Enruta solicitud con cabecera Authorization
     Orden->>Catalogo: OpenFeign: Valida precio y receta médica
     Orden->>Inventario: OpenFeign: Reserva temporal de lote (FEFO)
@@ -109,9 +132,10 @@ sequenceDiagram
     Pago->>Kafka: Publica mensaje en topic 'pago-eventos' (pago.validado)
 
     par Consistencia & Notificación
-        Kafka->>Orden: Actualiza estado a PAGADO
+        Kafka->>Orden: Actualiza estado a PAGADA
     and Facturación Electrónica SUNAT
         Kafka->>Facturacion: Consume 'pago.validado' y genera Comprobante Fiscal SUNAT
+        Facturacion->>Facturacion: Emite PDF descargable con iText
     end
 ```
 
@@ -139,7 +163,7 @@ sequenceDiagram
 ## 🛠️ Comandos de Demostración en Terminal
 
 ```bash
-# 1. Comprobar que todos los contenedores están arriba y sanos
+# 1. Comprobar que los 18 contenedores están arriba y sanos
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 # 2. Verificar las 8 bases de datos PostgreSQL creadas
@@ -149,6 +173,8 @@ docker exec -it medizano-postgres psql -U postgres -d postgres -c "\l"
 docker exec -it medizano-kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
 
 # 4. Probar la salud de un microservicio a través del Gateway
-curl -s http://localhost:8090/actuator/health | jq .
-```
+curl -s http://localhost:8090/actuator/health
 
+# 5. Ejecutar la auditoría funcional completa (10/10 OK)
+node run_e2e_audit.js
+```
