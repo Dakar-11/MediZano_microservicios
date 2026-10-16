@@ -20,17 +20,17 @@
     <description>Arquitectura distribuida de microservicios para MediZano POS con PayPal Sandbox</description>
     
     <modules>
-        <module>config-server</module>
-        <module>eureka-server</module>
-        <module>api-gateway</module>
-        <module>catalogo-ms</module>
-        <module>cliente-ms</module>
-        <module>orden-ms</module>
-        <module>inventario-ms</module>
-        <module>pago-ms</module>
-        <module>facturacion-ms</module>
-        <module>usuario-ms</module>
-        <module>proveedor-ms</module>
+        <module>infra/medizano-config</module>
+        <module>infra/medizano-eureka</module>
+        <module>infra/medizano-gateway</module>
+        <module>services/medizano-catalogo-ms</module>
+        <module>services/medizano-cliente-ms</module>
+        <module>services/medizano-orden-ms</module>
+        <module>services/medizano-inventario-ms</module>
+        <module>services/medizano-pago-ms</module>
+        <module>services/medizano-facturacion-ms</module>
+        <module>services/medizano-usuario-ms</module>
+        <module>services/medizano-proveedor-ms</module>
     </modules>
     
     <properties>

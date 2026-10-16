@@ -9,12 +9,12 @@
         <groupId>com.medizano</groupId>
         <artifactId>medizano-microservices-parent</artifactId>
         <version>1.0.0</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     
-    <artifactId>inventario-ms</artifactId>
-    <name>MediZano Inventario Microservice</name>
-    <description>Microservicio transaccional de Inventario, Kardex y Lotes (Aldo Calla)</description>
+    <artifactId>cliente-ms</artifactId>
+    <name>MediZano Cliente Microservice</name>
+    <description>Microservicio no transaccional de Gestión de Clientes (Kenyi Calsin)</description>
     
     <dependencies>
         <dependency>

@@ -9,12 +9,12 @@
         <groupId>com.medizano</groupId>
         <artifactId>medizano-microservices-parent</artifactId>
         <version>1.0.0</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     
-    <artifactId>orden-ms</artifactId>
-    <name>MediZano Orden Microservice</name>
-    <description>Microservicio transaccional de Órdenes y Pedidos POS (Kenyi Calsin)</description>
+    <artifactId>catalogo-ms</artifactId>
+    <name>MediZano Catalogo Microservice</name>
+    <description>Microservicio no transaccional de Catálogo de Medicamentos (Aldo Calla)</description>
     
     <dependencies>
         <dependency>
@@ -32,10 +32,6 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>

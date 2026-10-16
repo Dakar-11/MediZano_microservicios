@@ -9,12 +9,12 @@
         <groupId>com.medizano</groupId>
         <artifactId>medizano-microservices-parent</artifactId>
         <version>1.0.0</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     
-    <artifactId>facturacion-ms</artifactId>
-    <name>MediZano Facturacion Microservice</name>
-    <description>Microservicio transaccional de Facturación Electrónica SUNAT y Comprobantes (Juan Chambilla)</description>
+    <artifactId>inventario-ms</artifactId>
+    <name>MediZano Inventario Microservice</name>
+    <description>Microservicio transaccional de Inventario, Kardex y Lotes (Aldo Calla)</description>
     
     <dependencies>
         <dependency>
@@ -34,10 +34,6 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
@@ -50,22 +46,6 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        </dependency>
-        <!-- iText 7 for PDF receipt generation -->
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>kernel</artifactId>
-            <version>${itext.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>layout</artifactId>
-            <version>${itext.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>io</artifactId>
-            <version>${itext.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

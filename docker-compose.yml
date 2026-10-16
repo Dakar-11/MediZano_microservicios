@@ -4,7 +4,7 @@ services:
   # ============================================================
   frontend:
     build:
-      context: ./frontend
+      context: ./clients/medizano-frontend
       dockerfile: Dockerfile
     container_name: medizano-frontend
     restart: always
@@ -52,8 +52,8 @@ services:
   # ============================================================
   eureka-server:
     build:
-      context: ./medizano-microservices
-      dockerfile: eureka-server/Dockerfile
+      context: .
+      dockerfile: infra/medizano-eureka/Dockerfile
     container_name: medizano-eureka-server
     restart: always
     ports:
@@ -72,8 +72,8 @@ services:
 
   api-gateway:
     build:
-      context: ./medizano-microservices
-      dockerfile: api-gateway/Dockerfile
+      context: .
+      dockerfile: infra/medizano-gateway/Dockerfile
     container_name: medizano-api-gateway
     restart: always
     ports:
@@ -100,8 +100,8 @@ services:
 
   usuario-ms:
     build:
-      context: ./medizano-microservices
-      dockerfile: usuario-ms/Dockerfile
+      context: .
+      dockerfile: services/medizano-usuario-ms/Dockerfile
     container_name: medizano-usuario-ms
     restart: always
     expose:
@@ -130,8 +130,8 @@ services:
 
   catalogo-ms:
     build:
-      context: ./medizano-microservices
-      dockerfile: catalogo-ms/Dockerfile
+      context: .
+      dockerfile: services/medizano-catalogo-ms/Dockerfile
     container_name: medizano-catalogo-ms
     restart: always
     expose:
@@ -158,8 +158,8 @@ services:
 
   cliente-ms:
     build:
-      context: ./medizano-microservices
-      dockerfile: cliente-ms/Dockerfile
+      context: .
+      dockerfile: services/medizano-cliente-ms/Dockerfile
     container_name: medizano-cliente-ms
     restart: always
     expose:
@@ -186,8 +186,8 @@ services:
 
   orden-ms:
     build:
-      context: ./medizano-microservices
-      dockerfile: orden-ms/Dockerfile
+      context: .
+      dockerfile: services/medizano-orden-ms/Dockerfile
     container_name: medizano-orden-ms
     restart: always
     expose:
@@ -215,8 +215,8 @@ services:
 
   inventario-ms:
     build:
-      context: ./medizano-microservices
-      dockerfile: inventario-ms/Dockerfile
+      context: .
+      dockerfile: services/medizano-inventario-ms/Dockerfile
     container_name: medizano-inventario-ms
     restart: always
     expose:
@@ -244,8 +244,8 @@ services:
 
   pago-ms:
     build:
-      context: ./medizano-microservices
-      dockerfile: pago-ms/Dockerfile
+      context: .
+      dockerfile: services/medizano-pago-ms/Dockerfile
     container_name: medizano-pago-ms
     restart: always
     expose:
@@ -285,8 +285,8 @@ services:
 
   facturacion-ms:
     build:
-      context: ./medizano-microservices
-      dockerfile: facturacion-ms/Dockerfile
+      context: .
+      dockerfile: services/medizano-facturacion-ms/Dockerfile
     container_name: medizano-facturacion-ms
     restart: always
     expose:
@@ -314,8 +314,8 @@ services:
 
   proveedor-ms:
     build:
-      context: ./medizano-microservices
-      dockerfile: proveedor-ms/Dockerfile
+      context: .
+      dockerfile: services/medizano-proveedor-ms/Dockerfile
     container_name: medizano-proveedor-ms
     restart: always
     expose:
@@ -351,22 +351,13 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./obs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
-      - '--web.enable-lifecycle'
-    depends_on:
-      - api-gateway
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:9090/-/healthy | grep -q 'Prometheus Server is Healthy.' || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
     networks:
       - medizano-net
 
@@ -377,7 +368,7 @@ services:
     expose:
       - "3100"
     volumes:
-      - ./monitoring/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - ./obs/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
       - loki_data:/loki
     command: -config.file=/etc/loki/local-config.yaml
     healthcheck:
@@ -394,7 +385,7 @@ services:
     container_name: medizano-alloy
     restart: always
     volumes:
-      - ./monitoring/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - ./obs/alloy/config.alloy:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
     depends_on:
@@ -414,9 +405,9 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
-      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./obs/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./obs/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./obs/grafana/dashboards:/var/lib/grafana/dashboards:ro
     depends_on:
       - prometheus
       - loki
@@ -426,6 +417,9 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+    networks:
+      - medizano-net
+
   # ============================================================
   # 6. MENSAJERÍA ASÍNCRONA: Apache Kafka (KRaft) & Kafka UI
   # ============================================================

@@ -9,17 +9,17 @@
         <groupId>com.medizano</groupId>
         <artifactId>medizano-microservices-parent</artifactId>
         <version>1.0.0</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     
-    <artifactId>config-server</artifactId>
-    <name>MediZano Config Server</name>
-    <description>Servidor centralizado de configuración Spring Cloud Config</description>
+    <artifactId>eureka-server</artifactId>
+    <name>MediZano Eureka Server</name>
+    <description>Servidor de registro y descubrimiento de servicios Eureka</description>
     
     <dependencies>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-config-server</artifactId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
