@@ -55,7 +55,22 @@ El producto completo adaptado al dominio farmacéutico **MediZano POS** implemen
 ![Arquitectura General](../assets/images/arquitectura-medizano.png)
 
 ### Panel de Descubrimiento de Servicios (Eureka Service Discovery)
-![Eureka Dashboard](../assets/images/s03-3.9-eureka-dashboard.png)
+![Eureka Dashboard](../assets/images/eureka-discovery.png)
+
+### Consola Kafka UI (Broker KRaft y Topics de Mensajería)
+![Kafka UI](../assets/images/kafka-ui.png)
+
+### Suite de Observabilidad Grafana (Métricas y Logs Correlacionados)
+![Grafana Dashboard](../assets/images/grafana-dashboard.png)
+
+### Frontend Web POS (Angular 17)
+![Frontend POS](../assets/images/medizano-frontend.png)
+
+### API Gateway Centralizado y Swagger UI
+![Swagger Gateway](../assets/images/swagger-gateway.png)
+
+### Servidor de Métricas Prometheus
+![Prometheus Server](../assets/images/prometheus.png)
 
 ### Cliente Gráfico de Consultas y Endpoints
 ![Cliente Gráfico](../assets/images/s01-3.2.3-conectar-cliente-grafico.png)
