@@ -55,6 +55,18 @@ export class AppShellComponent implements OnInit {
       roles: [UserRole.CUSTOMER_SUPPORT, UserRole.ADMIN]
     },
     {
+      label: 'Proveedores',
+      route: '/suppliers',
+      icon: 'suppliers',
+      roles: [UserRole.MANAGER, UserRole.STOCK_MONITOR, UserRole.ADMIN]
+    },
+    {
+      label: 'Compras',
+      route: '/purchases',
+      icon: 'purchases',
+      roles: [UserRole.MANAGER, UserRole.STOCK_MONITOR, UserRole.ADMIN]
+    },
+    {
       label: 'Facturación',
       route: '/purchase-history',
       icon: 'purchase-history',

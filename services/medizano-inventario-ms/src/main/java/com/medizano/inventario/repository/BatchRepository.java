@@ -40,4 +40,5 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
     List<Batch> findAllOrderByCreatedAtDesc();
     
     Optional<Batch> findByBatchNumber(String batchNumber);
+    Optional<Batch> findByMedicineIdAndBatchNumber(Long medicineId, String batchNumber);
 }

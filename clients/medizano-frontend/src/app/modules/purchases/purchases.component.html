@@ -1,0 +1,353 @@
+<div class="purchases-container">
+  <div class="header-section">
+    <div>
+      <h1 class="page-title">Gestión de Compras y Abastecimiento</h1>
+      <p class="page-subtitle">Emisión de órdenes de compra, control de guías/facturas e ingreso atómico a almacén FEFO</p>
+    </div>
+    <button class="btn btn-primary" (click)="abrirNuevaCompra()">
+      <span class="icon">+</span> Nueva Compra
+    </button>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-title">Compras Recibidas</div>
+      <div class="kpi-value text-success">{{ totalComprasRecibidas }}</div>
+      <div class="kpi-sub">Existencias en almacén</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-title">Pendientes de Recepción</div>
+      <div class="kpi-value text-warning">{{ totalComprasPendientes }}</div>
+      <div class="kpi-sub">Por ingresar a FEFO</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-title">Monto Adquisiciones</div>
+      <div class="kpi-value text-primary">S/ {{ montoTotalMes | number:'1.2-2' }}</div>
+      <div class="kpi-sub">Total acumulado</div>
+    </div>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Barra de Búsqueda y Filtros -->
+  <div class="filter-card">
+    <div class="search-box">
+      <input
+        type="text"
+        [(ngModel)]="filtro"
+        (keyup.enter)="buscar()"
+        placeholder="Buscar por N° Documento, Proveedor o RUC..."
+        class="form-control"
+      />
+      <select [(ngModel)]="estadoFiltro" (change)="buscar()" class="form-select">
+        <option value="TODOS">Todos los estados</option>
+        <option value="PENDIENTE">Pendientes de Recepción</option>
+        <option value="RECIBIDA">Recibidas en Almacén</option>
+        <option value="CANCELADA">Canceladas</option>
+      </select>
+      <button class="btn btn-secondary" (click)="buscar()">Buscar</button>
+      <button class="btn btn-outline" (click)="limpiar()">Limpiar</button>
+    </div>
+    <div class="counter">
+      Total compras: <strong>{{ totalElements }}</strong>
+    </div>
+  </div>
+
+  <!-- Tabla de Compras -->
+  <div class="table-card">
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando órdenes de compra...</p>
+    </div>
+
+    <table *ngIf="!loading && compras.length > 0" class="data-table">
+      <thead>
+        <tr>
+          <th>Documento</th>
+          <th>Proveedor</th>
+          <th>Emisión</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th>Recepción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of compras">
+          <td>
+            <div class="main-text">{{ c.numeroDocumento }}</div>
+            <small class="sub-text">{{ c.tipoDocumento }}</small>
+          </td>
+          <td>
+            <div class="main-text">{{ c.proveedorRazonSocial }}</div>
+            <small class="sub-text">RUC: {{ c.proveedorRuc }}</small>
+          </td>
+          <td>{{ c.fechaEmision }}</td>
+          <td class="font-bold">S/ {{ c.total | number:'1.2-2' }}</td>
+          <td>
+            <span class="badge" [ngClass]="{
+              'badge-success': c.estado === 'RECIBIDA',
+              'badge-warning': c.estado === 'PENDIENTE',
+              'badge-danger': c.estado === 'CANCELADA',
+              'badge-info': c.estado === 'BORRADOR'
+            }">
+              {{ c.estado }}
+            </span>
+          </td>
+          <td>
+            <div *ngIf="c.fechaRecepcion" class="text-sm">
+              {{ c.fechaRecepcion | slice:0:10 }}
+              <br><small class="text-muted">Por: {{ c.usuarioRecepcion }}</small>
+            </div>
+            <span *ngIf="!c.fechaRecepcion" class="text-muted">-</span>
+          </td>
+          <td class="actions-cell">
+            <button class="btn btn-sm" (click)="verDetalles(c)" title="Ver Detalle">👁️ Ver</button>
+            <button *ngIf="c.estado === 'PENDIENTE'" class="btn btn-sm btn-success-light" (click)="abrirRecepcion(c)" title="Recibir Mercadería">
+              📥 Recibir
+            </button>
+            <button *ngIf="c.estado === 'PENDIENTE'" class="btn btn-sm btn-danger-light" (click)="cancelar(c)" title="Cancelar">
+              ❌
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!loading && compras.length === 0" class="empty-state">
+      <p>No hay compras registradas en el sistema.</p>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination-footer" *ngIf="totalPages > 1">
+      <span>Página {{ page + 1 }} de {{ totalPages }}</span>
+      <div class="pagination-buttons">
+        <button class="btn btn-sm" [disabled]="page === 0" (click)="cambiarPagina(-1)">Anterior</button>
+        <button class="btn btn-sm" [disabled]="page >= totalPages - 1" (click)="cambiarPagina(1)">Siguiente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Registrar Nueva Compra -->
+  <div class="modal-backdrop" *ngIf="showNuevaModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3>Registrar Nueva Orden de Compra</h3>
+        <button class="close-btn" (click)="cerrarNuevaModal()">&times;</button>
+      </div>
+      <form [formGroup]="compraForm" (ngSubmit)="guardarCompra()">
+        <div class="modal-body">
+          <div class="grid-3">
+            <div class="form-group">
+              <label>Proveedor DIGEMID*</label>
+              <select formControlName="proveedorId" class="form-control">
+                <option *ngFor="let p of proveedores" [ngValue]="p.id">
+                  {{ p.razonSocial }} ({{ p.ruc }})
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tipo Documento*</label>
+              <select formControlName="tipoDocumento" class="form-control">
+                <option *ngFor="let t of tiposDocumento" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>N° Comprobante*</label>
+              <input type="text" formControlName="numeroDocumento" class="form-control" placeholder="Ej: F001-000891" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Fecha de Emisión*</label>
+              <input type="date" formControlName="fechaEmision" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label>Observaciones</label>
+              <input type="text" formControlName="observaciones" class="form-control" placeholder="Condiciones de pago, guía de remisión, etc." />
+            </div>
+          </div>
+
+          <hr class="divider" />
+          <div class="items-header">
+            <h4>Ítems y Medicamentos a Comprar</h4>
+            <button type="button" class="btn btn-sm btn-outline" (click)="agregarDetalle()">+ Agregar Medicamento</button>
+          </div>
+
+          <div formArrayName="detalles" class="items-table-container">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Medicamento</th>
+                  <th>Cantidad</th>
+                  <th>Costo U. (S/)</th>
+                  <th>Lote Sugerido</th>
+                  <th>Vencimiento</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of detallesFormArray.controls; let i = index" [formGroupName]="i">
+                  <td style="width: 70px;">
+                    <input type="number" formControlName="productoId" class="form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <input type="text" formControlName="nombreProducto" class="form-control form-control-sm" />
+                  </td>
+                  <td style="width: 90px;">
+                    <input type="number" formControlName="cantidadComprada" class="form-control form-control-sm" min="1" />
+                  </td>
+                  <td style="width: 100px;">
+                    <input type="number" step="0.01" formControlName="costoUnitario" class="form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <input type="text" formControlName="loteSugerido" class="form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <input type="date" formControlName="fechaVencimiento" class="form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <button type="button" class="btn-icon text-danger" (click)="eliminarDetalle(i)">&times;</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="totals-summary">
+            <div>Subtotal Estimado: <strong>S/ {{ calcularSubtotal() | number:'1.2-2' }}</strong></div>
+            <div>IGV (18%): <strong>S/ {{ (calcularSubtotal() * 0.18) | number:'1.2-2' }}</strong></div>
+            <div class="total-line">Total Compra: <strong>S/ {{ (calcularSubtotal() * 1.18) | number:'1.2-2' }}</strong></div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarNuevaModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading || detallesFormArray.length === 0">
+            {{ loading ? 'Registrando...' : 'Emitir Orden de Compra' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar Recepción en Almacén FEFO -->
+  <div class="modal-backdrop" *ngIf="showRecepcionModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3>Recepción de Mercadería — {{ selectedCompra?.numeroDocumento }}</h3>
+        <button class="close-btn" (click)="cerrarRecepcionModal()">&times;</button>
+      </div>
+      <form [formGroup]="recepcionForm" (ngSubmit)="confirmarRecepcion()">
+        <div class="modal-body">
+          <div class="alert alert-info">
+            Al confirmar la recepción, el stock se incrementará automáticamente en <strong>inventario-ms</strong> y los lotes ingresarán al sistema bajo el modelo <strong>FEFO (First Expired, First Out)</strong> con trazabilidad completa de Kardex.
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Usuario que Recibe*</label>
+              <input type="text" formControlName="usuarioRecepcion" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label>Observaciones de Inspección</label>
+              <input type="text" formControlName="observaciones" class="form-control" />
+            </div>
+          </div>
+
+          <div formArrayName="items" class="items-table-container">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Medicamento</th>
+                  <th>Cant. Comprada</th>
+                  <th>Cant. Recibida*</th>
+                  <th>N° Lote Físico*</th>
+                  <th>Fecha Vencimiento*</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of itemsRecepcionArray.controls; let i = index" [formGroupName]="i">
+                  <td><strong>{{ item.get('nombreProducto')?.value }}</strong></td>
+                  <td>{{ item.get('cantidadComprada')?.value }}</td>
+                  <td style="width: 110px;">
+                    <input type="number" formControlName="cantidadRecibida" class="form-control form-control-sm" min="1" />
+                  </td>
+                  <td>
+                    <input type="text" formControlName="batchNumber" class="form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <input type="date" formControlName="expiryDate" class="form-control form-control-sm" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarRecepcionModal()">Cancelar</button>
+          <button type="submit" class="btn btn-success" [disabled]="loading">
+            {{ loading ? 'Actualizando Inventario...' : 'Confirmar Ingreso a Almacén' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Ver Detalles -->
+  <div class="modal-backdrop" *ngIf="showDetalleModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Detalle de Compra — {{ selectedCompra?.numeroDocumento }}</h3>
+        <button class="close-btn" (click)="cerrarDetalleModal()">&times;</button>
+      </div>
+      <div class="modal-body" *ngIf="selectedCompra">
+        <div class="grid-2 mb-3">
+          <div><strong>Proveedor:</strong> {{ selectedCompra.proveedorRazonSocial }}</div>
+          <div><strong>RUC:</strong> {{ selectedCompra.proveedorRuc }}</div>
+          <div><strong>Fecha Emisión:</strong> {{ selectedCompra.fechaEmision }}</div>
+          <div><strong>Estado:</strong> {{ selectedCompra.estado }}</div>
+          <div><strong>Subtotal:</strong> S/ {{ selectedCompra.subtotal | number:'1.2-2' }}</div>
+          <div><strong>Total:</strong> S/ {{ selectedCompra.total | number:'1.2-2' }}</div>
+        </div>
+
+        <h4>Lotes y Productos</h4>
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Medicamento</th>
+              <th>Comprado</th>
+              <th>Recibido</th>
+              <th>Costo Unit.</th>
+              <th>Lote</th>
+              <th>Vencimiento</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of selectedCompra.detalles">
+              <td>{{ d.nombreProducto }}</td>
+              <td>{{ d.cantidadComprada }}</td>
+              <td>{{ d.cantidadRecibida || 0 }}</td>
+              <td>S/ {{ d.costoUnitario | number:'1.2-2' }}</td>
+              <td>{{ d.loteSugerido || '-' }}</td>
+              <td>{{ d.fechaVencimiento || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarDetalleModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -5,6 +5,7 @@ import com.medizano.inventario.dto.InventarioDTO;
 import com.medizano.inventario.dto.MovimientoDTO;
 import com.medizano.inventario.dto.MovimientoRequest;
 import com.medizano.inventario.dto.RestockStockRequest;
+import com.medizano.inventario.dto.RecepcionCompraStockRequest;
 import com.medizano.inventario.service.InventarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -102,6 +103,15 @@ public class InventarioController {
             @RequestHeader("X-Internal-Service-Token") String providedToken) {
         validarTokenInterno(providedToken);
         inventarioService.reponerStockDevolucion(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/recepcion-compra")
+    @Operation(summary = "Ingresar mercadería recibida de una compra a proveedor", description = "Endpoint interno llamado por el microservicio de proveedores para registrar stock, lotes FEFO y kardex.")
+    public ResponseEntity<Void> registrarRecepcionCompra(@Valid @RequestBody RecepcionCompraStockRequest request,
+            @RequestHeader("X-Internal-Service-Token") String providedToken) {
+        validarTokenInterno(providedToken);
+        inventarioService.registrarRecepcionCompra(request);
         return ResponseEntity.ok().build();
     }
 

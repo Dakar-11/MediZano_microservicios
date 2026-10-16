@@ -51,6 +51,18 @@ const routes: Routes = [
     data: { roles: [UserRole.ANALYST, UserRole.MANAGER, UserRole.ADMIN] }
   },
   {
+    path: 'suppliers',
+    loadChildren: () => import('./modules/suppliers/suppliers.module').then(m => m.SuppliersModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [UserRole.MANAGER, UserRole.STOCK_MONITOR, UserRole.ADMIN] }
+  },
+  {
+    path: 'purchases',
+    loadChildren: () => import('./modules/purchases/purchases.module').then(m => m.PurchasesModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [UserRole.MANAGER, UserRole.STOCK_MONITOR, UserRole.ADMIN] }
+  },
+  {
     path: 'purchase-history',
     loadChildren: () => import('./modules/purchase-history/purchase-history.module').then(m => m.PurchaseHistoryModule),
     canActivate: [AuthGuard, RoleGuard],

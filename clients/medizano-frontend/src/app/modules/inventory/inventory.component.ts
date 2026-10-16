@@ -22,6 +22,9 @@ export class InventoryComponent implements OnInit {
   stockForm: FormGroup;
   batchForm: FormGroup;
 
+  searchTerm = '';
+  filtroTipo = 'TODOS'; // 'TODOS' | 'DISPONIBLE' | 'BAJO_STOCK' | 'VENCIDO'
+
   constructor(
     private inventoryService: InventoryService,
     private fb: FormBuilder,
@@ -55,7 +58,7 @@ export class InventoryComponent implements OnInit {
     this.inventoryService.getAllBatches().subscribe({
       next: (batches) => {
         this.allBatches = batches || [];
-        this.batches = this.allBatches;
+        this.aplicarFiltro();
         this.isLoading = false;
       },
       error: (error) => {
@@ -64,6 +67,32 @@ export class InventoryComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  aplicarFiltro(): void {
+    const term = (this.searchTerm || '').trim().toLowerCase();
+    this.batches = this.allBatches.filter(b => {
+      const matchText = !term || 
+        (b.medicineName && b.medicineName.toLowerCase().includes(term)) ||
+        (b.batchNumber && b.batchNumber.toLowerCase().includes(term));
+
+      if (!matchText) return false;
+
+      if (this.filtroTipo === 'BAJO_STOCK') {
+        return b.quantityAvailable <= 10 && !b.expired;
+      } else if (this.filtroTipo === 'VENCIDO') {
+        return b.expired;
+      } else if (this.filtroTipo === 'DISPONIBLE') {
+        return b.quantityAvailable > 10 && !b.expired;
+      }
+      return true;
+    });
+  }
+
+  limpiarFiltro(): void {
+    this.searchTerm = '';
+    this.filtroTipo = 'TODOS';
+    this.aplicarFiltro();
   }
 
   loadExpiredBatches(): void {

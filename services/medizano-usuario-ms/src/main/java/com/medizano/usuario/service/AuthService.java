@@ -39,7 +39,8 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.generateToken(authentication);
         
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByUsername(request.getUsername().trim())
+                .or(() -> userRepository.findByEmail(request.getUsername().trim()))
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
         auditService.log(AuditLog.ActionType.USER_LOGIN, user, "User", 

@@ -348,6 +348,7 @@ services:
       EUREKA_URI: http://eureka-server:8761/eureka/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN es obligatorio}
       JAVA_TOOL_OPTIONS: "-Xms64m -Xmx200m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8088/actuator/health | grep -q 'UP' || exit 1"]

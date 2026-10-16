@@ -64,8 +64,9 @@
         <div class="kpi-data">
           <span class="kpi-label">Medicamentos en Catálogo</span>
           <span class="kpi-value">{{ activeMedicinesCount }}</span>
-          <span class="kpi-subtext" [class.text-danger]="outOfStockMedicinesCount > 0">
-            {{ outOfStockMedicinesCount }} producto(s) sin stock
+          <span class="kpi-subtext" [class.text-danger]="outOfStockMedicinesCount > 0" [class.text-success]="outOfStockMedicinesCount === 0">
+            <span *ngIf="outOfStockMedicinesCount > 0">{{ outOfStockMedicinesCount }} producto(s) sin stock</span>
+            <span *ngIf="outOfStockMedicinesCount === 0">{{ inStockMedicinesCount }} con stock disponible</span>
           </span>
         </div>
       </div>

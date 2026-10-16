@@ -5,6 +5,7 @@ import com.medizano.inventario.dto.InventarioDTO;
 import com.medizano.inventario.dto.MovimientoDTO;
 import com.medizano.inventario.dto.MovimientoRequest;
 import com.medizano.inventario.dto.RestockStockRequest;
+import com.medizano.inventario.dto.RecepcionCompraStockRequest;
 import com.medizano.inventario.entity.Batch;
 import com.medizano.inventario.entity.Inventario;
 import com.medizano.inventario.entity.MovimientoInventario;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
@@ -269,6 +271,72 @@ public class InventarioService {
                 .operationKey(operationKey)
                 .operationType("RETURN")
                 .build());
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
+    public void registrarRecepcionCompra(RecepcionCompraStockRequest request) {
+        log.info("Procesando ingreso de mercadería por compra: {}", request.getNumeroCompra());
+        if (request.getNumeroCompra() == null || request.getNumeroCompra().isBlank()) {
+            throw new IllegalArgumentException("El número de compra es obligatorio");
+        }
+        String operationKey = "PURCHASE:" + request.getNumeroCompra().trim();
+        if (operationRepository.existsByOperationKey(operationKey)) {
+            log.info("Compra {} ya fue procesada previamente; idempotencia garantizada", operationKey);
+            return;
+        }
+
+        for (RecepcionCompraStockRequest.ItemRecepcionStock item : request.getItems()) {
+            if (item.getProductoId() == null || item.getCantidad() == null || item.getCantidad() <= 0) {
+                continue;
+            }
+
+            Batch batch = batchRepository.findByMedicineIdAndBatchNumber(item.getProductoId(), item.getBatchNumber().trim())
+                    .orElse(null);
+
+            if (batch != null) {
+                batch.setQuantityAvailable(batch.getQuantityAvailable() + item.getCantidad());
+                if (item.getExpiryDate() != null) {
+                    batch.setExpiryDate(item.getExpiryDate());
+                }
+                if (item.getPurchasePrice() != null) {
+                    batch.setPurchasePrice(item.getPurchasePrice());
+                }
+                batch = batchRepository.save(batch);
+            } else {
+                BigDecimal purchasePrice = item.getPurchasePrice() != null ? item.getPurchasePrice() : BigDecimal.valueOf(1.00);
+                BigDecimal defaultSellingPrice = purchasePrice.multiply(BigDecimal.valueOf(1.30)).setScale(2, java.math.RoundingMode.HALF_UP);
+                batch = Batch.builder()
+                        .medicineId(item.getProductoId())
+                        .medicineName(item.getProductoNombre() != null ? item.getProductoNombre() : "Medicamento #" + item.getProductoId())
+                        .batchNumber(item.getBatchNumber().trim())
+                        .expiryDate(item.getExpiryDate() != null ? item.getExpiryDate() : LocalDate.now().plusYears(1))
+                        .purchasePrice(purchasePrice)
+                        .sellingPrice(defaultSellingPrice)
+                        .quantityAvailable(item.getCantidad())
+                        .build();
+                batch = batchRepository.save(batch);
+            }
+
+            sincronizarInventario(item.getProductoId());
+
+            String proveedorTxt = (request.getProveedorNombre() != null && !request.getProveedorNombre().isBlank())
+                    ? " (" + request.getProveedorNombre() + ")" : "";
+            MovimientoInventario mov = MovimientoInventario.builder()
+                    .productoId(item.getProductoId())
+                    .tipo(MovimientoInventario.TipoMovimiento.ENTRADA)
+                    .cantidad(item.getCantidad())
+                    .referencia("Recepción Compra " + request.getNumeroCompra() + proveedorTxt + " [Lote: " + batch.getBatchNumber() + "]")
+                    .fecha(LocalDateTime.now())
+                    .build();
+            movimientoRepository.save(mov);
+        }
+
+        operationRepository.save(InventoryOperation.builder()
+                .operationKey(operationKey)
+                .operationType("PURCHASE")
+                .build());
+
+        log.info("Ingreso de mercadería completado exitosamente para compra {}", request.getNumeroCompra());
     }
 
     private void sincronizarInventario(Long productoId) {

@@ -229,6 +229,121 @@
   z-index: 0;
 }
 
+/* Inventory Toolbar */
+.inventory-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-4;
+  margin-bottom: $space-5;
+  flex-wrap: wrap;
+
+  .search-input-group {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    min-width: 280px;
+    max-width: 550px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--glass-elevated-border, #cbd5e1);
+    border-radius: $radius-xl;
+    padding: $space-2 $space-4;
+    transition: all 0.2s ease;
+
+    &:focus-within {
+      background: #ffffff;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .search-icon {
+      color: var(--color-text-secondary, #64748b);
+      margin-right: $space-2;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 0.95rem;
+      color: var(--color-text-primary, #0f172a);
+
+      &::placeholder {
+        color: #94a3b8;
+      }
+    }
+
+    .btn-clear-search {
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0 4px;
+      &:hover {
+        color: #0f172a;
+      }
+    }
+  }
+
+  .filter-actions {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    flex-wrap: wrap;
+
+    .filter-select {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--glass-elevated-border, #cbd5e1);
+      border-radius: $radius-xl;
+      padding: $space-2 $space-4;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--color-text-primary, #1e293b);
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:focus {
+        border-color: $color-primary;
+      }
+    }
+
+    .btn-filter-reset {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      border-radius: $radius-xl;
+      padding: $space-2 $space-4;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+    }
+
+    .results-badge {
+      font-size: 0.875rem;
+      color: #64748b;
+      padding: $space-2 $space-3;
+      background: rgba(241, 245, 249, 0.7);
+      border-radius: $radius-full;
+      white-space: nowrap;
+
+      strong {
+        color: #0f172a;
+      }
+    }
+  }
+}
+
 /* Empty States */
 .empty-state {
   display: flex;

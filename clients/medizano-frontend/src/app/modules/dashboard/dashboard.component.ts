@@ -61,22 +61,42 @@ export class DashboardComponent implements OnInit {
   loadDashboardData(): void {
     this.isLoading = true;
     const today = this.todayIso;
-    const canViewReports = this.authService.hasAnyRole([UserRole.ANALYST, UserRole.MANAGER]);
-    const canViewMedicines = this.authService.hasAnyRole([UserRole.CASHIER, UserRole.STOCK_KEEPER, UserRole.STOCK_MONITOR]);
-    const canViewStock = this.authService.hasAnyRole([UserRole.CASHIER, UserRole.STOCK_KEEPER, UserRole.STOCK_MONITOR]);
+    const canViewReports = this.authService.hasAnyRole([UserRole.ADMIN, UserRole.ANALYST, UserRole.MANAGER]);
+    const canViewMedicines = this.authService.hasAnyRole([UserRole.ADMIN, UserRole.CASHIER, UserRole.STOCK_KEEPER, UserRole.STOCK_MONITOR]);
+    const canViewStock = this.authService.hasAnyRole([UserRole.ADMIN, UserRole.CASHIER, UserRole.STOCK_KEEPER, UserRole.STOCK_MONITOR]);
     const canViewAudit = this.authService.hasRole(UserRole.ADMIN);
 
     forkJoin({
       sales: canViewReports ? this.reportService.getDailySalesReport(today, today).pipe(catchError(() => of(null))) : of(null),
       cash: canViewReports ? this.reportService.getCashRegisterReport(today, today).pipe(catchError(() => of(null))) : of(null),
       medicines: canViewMedicines ? this.inventoryService.getAllMedicines().pipe(catchError(() => of([]))) : of([] as Medicine[]),
+      batches: canViewStock ? this.inventoryService.getAllBatches().pipe(catchError(() => of([]))) : of([] as Batch[]),
       lowStock: canViewStock ? this.inventoryService.getLowStockBatches(10).pipe(catchError(() => of([]))) : of([] as Batch[]),
       audit: canViewAudit ? this.auditLogService.getAllAuditLogs().pipe(catchError(() => of([]))) : of([] as AuditLogResponse[])
     }).subscribe({
       next: (res) => {
         this.salesReport = res.sales;
         this.cashReport = res.cash;
-        this.medicines = res.medicines || [];
+        const allBatches = res.batches || [];
+        
+        // Mapear stock real desde los lotes activos a los medicamentos
+        const stockMap = new Map<number, number>();
+        allBatches.forEach(b => {
+          const current = stockMap.get(b.medicineId) || 0;
+          stockMap.set(b.medicineId, current + (b.quantityAvailable || 0));
+        });
+
+        this.medicines = (res.medicines || []).map(m => {
+          const actualStock = stockMap.has(m.id) ? stockMap.get(m.id)! : (m.totalStock || 0);
+          return {
+            ...m,
+            totalStock: actualStock,
+            availableStock: actualStock,
+            outOfStock: actualStock === 0,
+            lowStock: actualStock > 0 && actualStock <= (m.lowStockThreshold || 10)
+          };
+        });
+
         this.lowStockBatches = res.lowStock || [];
         this.recentActivities = (res.audit || []).slice(0, 5);
         this.isLoading = false;
@@ -105,6 +125,10 @@ export class DashboardComponent implements OnInit {
 
   get outOfStockMedicinesCount(): number {
     return this.medicines.filter(m => m.outOfStock).length;
+  }
+
+  get inStockMedicinesCount(): number {
+    return this.medicines.filter(m => !m.outOfStock).length;
   }
 
   formatDate(dateString: string): string {

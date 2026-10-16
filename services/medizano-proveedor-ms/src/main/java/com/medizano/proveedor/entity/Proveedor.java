@@ -2,13 +2,17 @@ package com.medizano.proveedor.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "proveedores")
+@Table(name = "proveedores", indexes = {
+        @Index(name = "idx_proveedores_ruc", columnList = "ruc"),
+        @Index(name = "idx_proveedores_razon", columnList = "razonSocial")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,17 +24,21 @@ public class Proveedor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(min = 11, max = 11)
+    @NotBlank(message = "El RUC es obligatorio")
+    @Size(min = 11, max = 11, message = "El RUC debe tener exactamente 11 dígitos")
+    @Pattern(regexp = "^(10|15|17|20)\\d{9}$", message = "El RUC peruano debe ser de 11 dígitos numéricos y comenzar con 10, 15, 17 o 20")
     @Column(nullable = false, unique = true, length = 11)
     private String ruc;
 
-    @NotBlank
+    @NotBlank(message = "La razón social es obligatoria")
     @Column(nullable = false, length = 150)
     private String razonSocial;
 
     @Column(length = 150)
     private String nombreComercial;
+
+    @Column(length = 150)
+    private String contactoResponsable;
 
     @Column(length = 255)
     private String direccionFiscal;
@@ -44,12 +52,18 @@ public class Proveedor {
     @Column(length = 50)
     private String registroDigemid;
 
+    @Column(length = 500)
+    private String observaciones;
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean activo = true;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime fechaRegistro;
+
+    @Column
+    private LocalDateTime fechaActualizacion;
 
     @PrePersist
     public void prePersist() {
@@ -60,5 +74,9 @@ public class Proveedor {
             activo = true;
         }
     }
-}
 
+    @PreUpdate
+    public void preUpdate() {
+        fechaActualizacion = LocalDateTime.now();
+    }
+}

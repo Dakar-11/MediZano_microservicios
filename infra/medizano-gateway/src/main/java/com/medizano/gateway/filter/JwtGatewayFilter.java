@@ -135,12 +135,15 @@ public class JwtGatewayFilter implements GlobalFilter, Ordered {
                 log.warn("Acceso denegado a caja: usuario={}, rol={}", username, normalizedRole);
                 return onError(exchange, HttpStatus.FORBIDDEN, "Acceso denegado: Se requiere rol de Cajero o Administrador");
             }
-        } else if ((path.startsWith("/api/v1/pagos/") || path.startsWith("/api/v1/ordenes/"))
+        } else if ((path.startsWith("/api/v1/pagos") || path.startsWith("/api/v1/ordenes"))
                 && !hasRole(normalizedRole, "ADMIN", "CASHIER")) {
             return onError(exchange, HttpStatus.FORBIDDEN, "Acceso denegado: Se requiere rol de caja");
-        } else if (path.startsWith("/api/v1/inventario/")
-                && !hasRole(normalizedRole, "ADMIN", "STOCK_MONITOR")) {
+        } else if (path.startsWith("/api/v1/inventario")
+                && !hasRole(normalizedRole, "ADMIN", "STOCK_MONITOR", "STOCK_KEEPER")) {
             return onError(exchange, HttpStatus.FORBIDDEN, "Acceso denegado: Se requiere rol de inventario");
+        } else if ((path.startsWith("/api/v1/proveedores") || path.startsWith("/api/v1/compras"))
+                && !hasRole(normalizedRole, "ADMIN", "MANAGER", "STOCK_KEEPER", "STOCK_MONITOR")) {
+            return onError(exchange, HttpStatus.FORBIDDEN, "Acceso denegado: Se requiere rol de administración o almacén");
         }
 
         // Reenviar identidad en headers internos

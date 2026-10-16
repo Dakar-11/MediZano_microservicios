@@ -38,43 +38,43 @@ spring:
         - id: catalogo-service
           uri: lb://catalogo-ms
           predicates:
-            - Path=/api/v1/productos/**, /api/pharmacist/medicines/**
+            - Path=/api/v1/productos, /api/v1/productos/**, /api/pharmacist/medicines, /api/pharmacist/medicines/**
 
         # Inventario, Lotes y Stock
         - id: inventario-service
           uri: lb://inventario-ms
           predicates:
-            - Path=/api/v1/inventario/**, /api/pharmacist/batches/**
+            - Path=/api/v1/inventario, /api/v1/inventario/**, /api/pharmacist/batches, /api/pharmacist/batches/**
 
         # Clientes
         - id: cliente-service
           uri: lb://cliente-ms
           predicates:
-            - Path=/api/v1/clientes/**
+            - Path=/api/v1/clientes, /api/v1/clientes/**
 
         # Órdenes de compra transaccionales
         - id: orden-service
           uri: lb://orden-ms
           predicates:
-            - Path=/api/v1/ordenes/**
+            - Path=/api/v1/ordenes, /api/v1/ordenes/**
 
         # Facturación, POS Ventas, Devoluciones y Reportes
         - id: facturacion-service
           uri: lb://facturacion-ms
           predicates:
-            - Path=/api/v1/facturacion/**, /api/cashier/bills/**, /api/cashier/returns/**, /api/admin/reports/**
+            - Path=/api/v1/facturacion, /api/v1/facturacion/**, /api/cashier/bills, /api/cashier/bills/**, /api/cashier/returns, /api/cashier/returns/**, /api/admin/reports, /api/admin/reports/**
 
-        # Proveedores y Laboratorios
+        # Proveedores, Laboratorios y Compras
         - id: proveedor-service
           uri: lb://proveedor-ms
           predicates:
-            - Path=/api/v1/proveedores/**
+            - Path=/api/v1/proveedores, /api/v1/proveedores/**, /api/v1/compras, /api/v1/compras/**
 
         # Pasarelas de Pago (PayPal Sandbox y Mercado Pago)
         - id: pago-service
           uri: lb://pago-ms
           predicates:
-            - Path=/api/v1/pagos/**, /api/cashier/paypal/**, /api/cashier/mercadopago/**
+            - Path=/api/v1/pagos, /api/v1/pagos/**, /api/cashier/paypal/**, /api/cashier/mercadopago/**
 
         # Documentacion OpenAPI / Swagger Centralizada
         - id: usuario-docs
