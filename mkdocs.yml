@@ -1,13 +1,14 @@
 site_name: MediZano POS - Microservicios
-site_url: https://upeu-distribuidas.github.io/medizano/
-repo_url: https://github.com/upeu-distribuidas/medizano
-repo_name: medizano-pos
+site_url: http://localhost:8000/medizano/
+repo_url: https://github.com/rbn-69-cod/MediZano_microservicios
+repo_name: rbn-69-cod/MediZano_microservicios
 docs_dir: docs
 
 nav:
   - Inicio: index.md
   - Proyecto Sello:
       - Guía del Proyecto: proyecto-sello/index.md
+      - Guía de Exposición y Sustentación: proyecto-sello/guia-exposicion.md
       - Brief Técnico (Hito S2 - 4 Integrantes): proyecto-sello/brief.md
       - Alcance por Microservicio: proyecto-sello/alcance-microservicios.md
       - Producto Unidad 1: proyecto-sello/u1-producto.md

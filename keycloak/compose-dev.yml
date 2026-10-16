@@ -44,3 +44,4 @@ services:
 
 volumes:
   medizano_keycloak_db_data:
+

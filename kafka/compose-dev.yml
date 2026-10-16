@@ -41,3 +41,4 @@ services:
 networks:
   medizano-kafka-net:
     name: medizano-kafka-net
+

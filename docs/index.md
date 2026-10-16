@@ -2,6 +2,24 @@
 
 Curso de **Desarrollo de Aplicaciones Distribuidas** (DIST), UPeU 2026-2.
 
+> [!IMPORTANT]
+> ### 🚀 Tablero de Enlaces Directos en Vivo (1-Click Access)
+> Acceso inmediato a todos los servicios de infraestructura y documentación interactiva levantados localmente:
+> 
+> * 📖 **Portal de Documentación MkDocs:** [http://localhost:8000/medizano/](http://localhost:8000/medizano/)
+> * 📑 **Swagger UI Centralizado (API Gateway):** [http://localhost:8090/swagger-ui.html](http://localhost:8090/swagger-ui.html)
+> * 🔭 **Eureka Service Discovery:** [http://localhost:8761/](http://localhost:8761/)
+> * 📨 **Kafka UI (Kafbat Message Broker):** [http://localhost:18085/](http://localhost:18085/)
+> * 📊 **Grafana Observabilidad:** [http://localhost:3000/](http://localhost:3000/) *(Usuario: `admin` / Password: `admin`)*
+> * 📈 **Prometheus Server:** [http://localhost:9090/](http://localhost:9090/)
+> * 🎤 **Guía Maestra de Exposición & Sustentación:** [Abrir Guía de Exposición](proyecto-sello/guia-exposicion.md)
+
+---
+
+## 🏛️ Diagrama General de Arquitectura
+
+![Arquitectura Distribuida MediZano POS](assets/images/arquitectura-medizano.png)
+
 **MediZano POS** es una plataforma integral de Punto de Venta (POS) y Gestión Farmacéutica construida bajo una **arquitectura distribuida de microservicios nativa de la nube**, contenerizada con Docker, descubrimiento dinámico con Eureka, seguridad reactiva perimetral y distribuida con JWT / Keycloak, frontend en Angular 17 sobre Nginx, mensajería asíncrona con Apache Kafka, consistencia mediante Saga Coreografiada y observabilidad completa con Actuator, Micrometer, Prometheus, Loki y Grafana.
 
 ---

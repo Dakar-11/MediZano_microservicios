@@ -1,6 +1,24 @@
-# MediZano POS
+# MediZano POS - Microservicios Farmacéuticos 2026-2
 
 Sistema empresarial distribuido de Punto de Venta (POS) y Gestión Farmacéutica — proyecto del curso **Desarrollo de Aplicaciones Distribuidas** (DIST), UPeU 2026-2.
+
+> [!IMPORTANT]
+> ### 🚀 Tablero de Enlaces Directos en Vivo (1-Click Access)
+> Abre directamente cualquiera de los paneles locales haciendo clic en sus enlaces:
+> 
+> * 📖 **Portal de Documentación MkDocs:** [http://localhost:8000/medizano/](http://localhost:8000/medizano/)
+> * 📑 **Swagger UI Centralizado (API Gateway):** [http://localhost:8090/swagger-ui.html](http://localhost:8090/swagger-ui.html)
+> * 🔭 **Eureka Service Discovery:** [http://localhost:8761/](http://localhost:8761/)
+> * 📨 **Kafka UI (Kafbat Message Broker):** [http://localhost:18085/](http://localhost:18085/)
+> * 📊 **Grafana Observabilidad:** [http://localhost:3000/](http://localhost:3000/) *(Credenciales: `admin` / `admin`)*
+> * 📈 **Prometheus Server:** [http://localhost:9090/](http://localhost:9090/)
+> * 🎯 **Guía Maestra de Sustentación:** [Abrir Guía de Exposición](docs/proyecto-sello/guia-exposicion.md)
+
+---
+
+## 🏛️ Arquitectura General del Sistema
+
+![Arquitectura Distribuida MediZano POS](docs/assets/images/arquitectura-medizano.png)
 
 ---
 
@@ -8,7 +26,8 @@ Sistema empresarial distribuido de Punto de Venta (POS) y Gestión Farmacéutica
 
 La documentación técnica completa (sílabo, C4, brief técnico, alcance y rúbricas oficiales) vive en [`docs/`](docs/index.md) y se publica como sitio con **MkDocs Material**:
 
-* **Sitio Web:** [MediZano POS Docs](http://localhost:8000/medizano/)
+* **Sitio Web:** [MediZano POS Docs (http://localhost:8000/medizano/)](http://localhost:8000/medizano/)
+* **Guía de Exposición y Sustentación:** [`docs/proyecto-sello/guia-exposicion.md`](docs/proyecto-sello/guia-exposicion.md)
 * **Brief Técnico (Hito S2):** [`docs/proyecto-sello/brief.md`](docs/proyecto-sello/brief.md)
 * **Producto Unidad 1 (S5):** [`docs/proyecto-sello/u1-producto.md`](docs/proyecto-sello/u1-producto.md)
 * **Producto Unidad 2 (Rúbrica Oficial S12):** [`docs/proyecto-sello/u2-producto.md`](docs/proyecto-sello/u2-producto.md)
@@ -213,3 +232,94 @@ flowchart TD
 * **Frontend:** Angular 17 SPA, TypeScript, TailwindCSS / Bootstrap, Nginx.
 * **Documentación de APIs:** OpenAPI v3 / Swagger UI con autorización Bearer Auth.
 * **Documentación del Proyecto:** MkDocs con tema Material y diagramas Mermaid.
+
+---
+
+## 9. 🎤 Guía Maestra de Exposición para Examen / Sustentación
+
+### ⏱️ Cronograma de Exposición (10 Minutos)
+
+```mermaid
+gantt
+    title Cronograma de Sustentación en Vivo (10 Minutos)
+    dateFormat  mm
+    axisFormat  %M:%S
+    section Inicio
+    Introducción & Arquitectura C4 (Kenyi) :00, 02m
+    section Demostración
+    Autenticación JWT & RBAC (Igarlos)     :02, 02m
+    Catálogo & FEFO Kardex (Aldo)          :04, 02m
+    Orden POS & Saga Kafka (Kenyi/Igarlos) :06, 02m
+    Facturación SUNAT & DIGEMID (Juan)     :08, 01m
+    section Cierre
+    Observabilidad & Preguntas (Todos)     :09, 01m
+```
+
+### 👥 Rol Individual y Demostración en Vivo por Integrante
+
+1. **Kenyi Calsin (`orden-ms` :8082 Transaccional + `cliente-ms` :8084 No Transaccional):**
+   - Muestra el registro dinámico de instancias en **Eureka (`:8761`)**.
+   - Ejecuta una venta POS en **Swagger (`:8090/swagger-ui.html`)** demostrando la comunicación síncrona vía **OpenFeign** y resiliencia con **Resilience4j Circuit Breaker**.
+   - Muestra el evento publicado en el topic `orden-eventos` en **Kafka UI (`:18085`)**.
+
+2. **Aldo Calla (`inventario-ms` :8085 Transaccional + `catalogo-ms` :8081 No Transaccional):**
+   - Explica el control de existencias bajo la regla farmacéutica **FEFO (First Expired, First Out)** priorizando vencimientos de medicinas.
+   - Demuestra los movimientos Kardex y la compensación de stock en caso de orden cancelada.
+
+3. **Igarlos Mamani (`pago-ms` :8083 Transaccional + `usuario-ms` :8087 No Transaccional):**
+   - Demuestra el flujo de seguridad emitiendo un token **JWT con roles RBAC** (`ROLE_FARMACEUTICO`) y validación en Gateway y microservicios.
+   - Muestra el procesamiento de cobro asíncrono con **consumidor Kafka idempotente** (`uk_pagos_orden`) y pasarela PayPal / Mercado Pago.
+
+4. **Juan Chambilla (`facturacion-ms` :8086 Transaccional + `proveedor-ms` :8088 No Transaccional):**
+   - Muestra la generación automática de Comprobantes Fiscales SUNAT (Boletas/Facturas con cálculo de IGV 18%) al consumir `pago.validado`.
+   - Explica el catálogo maestro de proveedores farmacéuticos certificados con registro DIGEMID.
+
+---
+
+### 🔄 Diagrama de Secuencia de la Venta POS (Saga Coreografiada)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Cajero as Farmacéutico / Cajero
+    participant Gateway as API Gateway (:8090)
+    participant Auth as usuario-ms (:8087)
+    participant Orden as orden-ms (:8082)
+    participant Catalogo as catalogo-ms (:8081)
+    participant Inventario as inventario-ms (:8085)
+    participant Kafka as Apache Kafka (:19092)
+    participant Pago as pago-ms (:8083)
+    participant Facturacion as facturacion-ms (:8086)
+
+    Cajero->>Gateway: POST /api/usuarios/login (Credenciales)
+    Gateway->>Auth: Valida BCrypt y genera JWT
+    Auth-->>Cajero: Retorna Token Bearer JWT (ROLE_FARMACEUTICO)
+
+    Cajero->>Gateway: POST /api/ordenes (Crear Venta POS + Token)
+    Gateway->>Orden: Enruta solicitud con cabecera Authorization
+    Orden->>Catalogo: OpenFeign: Valida precio y receta médica
+    Orden->>Inventario: OpenFeign: Reserva temporal de lote (FEFO)
+    Orden->>Orden: Persiste cabecera y detalle en PostgreSQL
+    Orden->>Kafka: Publica mensaje en topic 'orden-eventos' (orden.creada)
+    Orden-->>Cajero: 201 Created (Orden en estado PENDIENTE)
+
+    Kafka->>Pago: Event-Driven: Consume 'orden.creada'
+    Pago->>Pago: Procesa cobro (Mercado Pago / PayPal) e inserta con idempotencia
+    Pago->>Kafka: Publica mensaje en topic 'pago-eventos' (pago.validado)
+
+    par Consistencia & Notificación
+        Kafka->>Orden: Actualiza estado a PAGADO
+    and Facturación Electrónica SUNAT
+        Kafka->>Facturacion: Consume 'pago.validado' y genera Comprobante Fiscal SUNAT
+    end
+```
+
+---
+
+### ❓ Respuestas Rápidas para Preguntas del Jurado
+
+* **¿Por qué Database per Service?** Cada microservicio posee su propia base en PostgreSQL (`medizano-postgres:5432`) evitando acoplamiento de esquema y bloqueos de tablas entre dominios.
+* **¿Cómo garantizan Idempotencia?** Con restricciones `UNIQUE (orden_id)` en la tabla `pagos` y verificación previa en los consumidores de Kafka para evitar cobros dobles.
+* **¿Qué pasa si cae un servicio?** OpenFeign activa el Circuit Breaker de Resilience4j retornando una respuesta fallback sin colapsar el Gateway ni la experiencia del usuario.
+* **¿Cómo rastrean una petición?** Con Spring Boot Actuator, Micrometer y Loki vinculando logs distribuidos a través del header `traceId`.
+
