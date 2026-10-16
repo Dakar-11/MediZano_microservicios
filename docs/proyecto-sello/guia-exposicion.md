@@ -32,6 +32,24 @@ Durante la exposición, mantén estas pestañas abiertas en el navegador del pre
 
 ---
 
+## 🔐 Matriz de Usuarios y Credenciales para la Demostración en Vivo
+
+Todas las cuentas se autentican con la contraseña **`admin123`** y permiten probar la protección de rutas por roles en Angular y Spring Security:
+
+| Usuario | Contraseña | Rol / Perfil | Módulo para Probar en Demostración |
+| :--- | :--- | :--- | :--- |
+| **`admin`** | `admin123` | `ROLE_ADMIN` | Control total, bitácora de auditoría (`/user-activity`) y gestión de usuarios. |
+| **`cajero`** | `admin123` | `ROLE_CASHIER` | Pantalla de venta POS (`/billing`), escaneo de medicamentos y cobro digital. |
+| **`inventario`** | `admin123` | `ROLE_STOCK_MONITOR` | Monitoreo de existencias y lotes farmacéuticos FEFO (`/inventory`). |
+| **`almacen`** | `admin123` | `ROLE_STOCK_KEEPER` | Catálogo de medicamentos y registro de ingresos por compras (`/medicines`). |
+| **`soporte`** | `admin123` | `ROLE_CUSTOMER_SUPPORT` | Módulo de reclamos, devoluciones de medicamentos y notas de crédito (`/returns`). |
+| **`analista`** | `admin123` | `ROLE_ANALYST` | Reportes de ventas, arqueo de caja y comprobantes fiscales (`/reports`). |
+| **`gerente`** | `admin123` | `ROLE_MANAGER` | Historial consolidado de compras y supervisión general (`/purchase-history`). |
+
+![Login Frontend POS](../assets/images/medizano-login.png)
+
+---
+
 ## 👥 Reparto Individual por Integrante (2 Microservicios c/u)
 
 Cumpliendo con la directiva oficial del sílabo (**1 microservicio transaccional cabecera-detalle + 1 microservicio no transaccional catálogo/maestro por persona**):

@@ -147,7 +147,32 @@ Disponible en: **`http://localhost:8000/medizano/`**
 
 ---
 
-## 7. Arquitectura del Sistema (Diagramas C4)
+## 7. Directorio de Usuarios, Credenciales de Acceso y Matriz RBAC
+
+El sistema cuenta con **7 usuarios pre-cargados** en la base de datos `medizano_usuarios_db` para pruebas y demostración de control de acceso por roles (RBAC):
+
+| Usuario | Contraseña | Rol (Spring Security / JWT) | Correo Electrónico | Módulo Asignado en Frontend | Funcionalidad en MediZano POS |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`admin`** | `admin123` | `ROLE_ADMIN` | `admin@medizano.pe` | Todas las rutas (`/dashboard`, `/user-management`, etc.) | **Control Total:** Auditoría global de accesos, gestión de usuarios, roles y métricas. |
+| **`cajero`** | `admin123` | `ROLE_CASHIER` | `cajero@medizano.pe` | Punto de Venta (`/billing`) | **Caja POS:** Venta por código de barras, checkout con PayPal / Mercado Pago y emisión de tickets. |
+| **`inventario`** | `admin123` | `ROLE_STOCK_MONITOR` | `inventario@medizano.pe` | Monitor de Stock (`/inventory`) | **Control de Existencias:** Visualización de lotes activos y alertas de caducidad FEFO. |
+| **`almacen`** | `admin123` | `ROLE_STOCK_KEEPER` | `almacen@medizano.pe` | Catálogo Maestro (`/medicines`) | **Almacén:** Catálogo farmacéutico, ingreso de mercadería y ajuste de lotes. |
+| **`soporte`** | `admin123` | `ROLE_CUSTOMER_SUPPORT` | `soporte@medizano.pe` | Devoluciones (`/returns`) | **Atención al Cliente:** Directorio de pacientes, consulta de recetas y notas de crédito. |
+| **`analista`** | `admin123` | `ROLE_ANALYST` | `analista@medizano.pe` | Reportes (`/reports`) | **Finanzas:** Reportes consolidados de ventas, arqueo de caja y declaraciones tributarias. |
+| **`gerente`** | `admin123` | `ROLE_MANAGER` | `gerente@medizano.pe` | Historial y Reportes (`/purchase-history`) | **Supervisión:** Auditoría de operaciones, aprobación de anulaciones y proveedores. |
+
+> [!NOTE]
+> ### 🛡️ Flujo de Autenticación y Seguridad Distribuida
+> 1. **Hash BCrypt:** Contraseñas encriptadas con salting seguro en PostgreSQL.
+> 2. **Token JWT:** `usuario-ms` genera tokens firmados con HMAC-SHA384 portando el claim `role`.
+> 3. **Perímetro en Gateway:** `api-gateway` valida el token antes de enrutar las peticiones.
+> 4. **Guards en Frontend:** `AuthGuard` y `RoleGuard` restringen el acceso visual en Angular 17.
+
+![Pantalla de Autenticación MediZano POS](docs/assets/images/medizano-login.png)
+
+---
+
+## 8. Arquitectura del Sistema (Diagramas C4)
 
 ### C4 Nivel 1: Contexto del Sistema
 ```mermaid

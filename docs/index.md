@@ -113,6 +113,33 @@ flowchart TD
 
 ---
 
+## 🔐 Directorio de Usuarios, Credenciales de Acceso y Matriz RBAC
+
+Para acceder al sistema desde el cliente web ([http://localhost:4200/auth/login](http://localhost:4200/auth/login)) o consumir los endpoints vía API Gateway (`:8090`), se dispone de **7 cuentas pre-configuradas** con roles diferenciados:
+
+| Usuario | Contraseña | Rol en Sistema | Correo Electrónico | Funcionalidad y Alcance en MediZano POS | Rutas Permitidas en Frontend |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`admin`** | `admin123` | `ADMIN` | `admin@medizano.pe` | **Acceso Total:** Auditoría global de accesos, gestión de usuarios, roles, métricas y configuración perimetral. | `/dashboard`, `/user-management`, `/user-activity`, `/login-history`, y todas las rutas. |
+| **`cajero`** | `admin123` | `CASHIER` | `cajero@medizano.pe` | **Punto de Venta (POS):** Búsqueda de medicamentos por código de barras, emisión de órdenes, cobro con pasarelas (PayPal/Mercado Pago) y facturación. | `/dashboard`, `/billing` |
+| **`inventario`** | `admin123` | `STOCK_MONITOR` | `inventario@medizano.pe` | **Control de Existencias:** Monitoreo de stock, visualización de lotes activos y control de vencimiento farmacéutico bajo regla FEFO. | `/dashboard`, `/inventory` |
+| **`almacen`** | `admin123` | `STOCK_KEEPER` | `almacen@medizano.pe` | **Logística Farmacéutica:** Catálogo de medicamentos, registro de ingresos por compras a laboratorios y actualización de lotes. | `/dashboard`, `/medicines` |
+| **`soporte`** | `admin123` | `CUSTOMER_SUPPORT` | `soporte@medizano.pe` | **Atención al Cliente:** Directorio de pacientes/clientes, consulta de recetas, historial de órdenes y registro de devoluciones/reembolsos. | `/dashboard`, `/returns` |
+| **`analista`** | `admin123` | `ANALYST` | `analista@medizano.pe` | **Reportes & Finanzas:** Reportes consolidados de ventas, conciliación de caja, declaraciones tributarias SUNAT y analítica. | `/dashboard`, `/reports` |
+| **`gerente`** | `admin123` | `MANAGER` | `gerente@medizano.pe` | **Supervisión Gerencial:** Aprobación de devoluciones, auditoría gerencial de arqueo de caja y contratos con proveedores DIGEMID. | `/dashboard`, `/purchase-history`, `/reports` |
+
+> [!NOTE]
+> ### 🛡️ Arquitectura de Seguridad (Defense in Depth)
+> 1. **Cifrado de Credenciales:** Todas las contraseñas se almacenan como hashes irreversibles **BCrypt** con 10 rondas de salting en `medizano_usuarios_db`.
+> 2. **Token JWT Asimétrico:** Al iniciar sesión en `POST /api/auth/login`, `usuario-ms` emite un token **JSON Web Token (HMAC-SHA384)** que transporta el claim `role`, nombre de usuario y expiración.
+> 3. **Validación Reactiva en Gateway:** El `api-gateway` (`:8090`) intercepta cada petición HTTP, verifica la firma criptográfica y el vencimiento antes de enrutar el tráfico hacia la red interna.
+> 4. **Protección de Rutas en Angular (Guards):** El cliente SPA cuenta con `AuthGuard` (comprueba sesión activa en `sessionStorage`) y `RoleGuard` (verifica que el rol del usuario figure en la lista autorizada de la ruta).
+> 5. **Control Granular en Backend:** Cada microservicio evalúa `@PreAuthorize("hasRole('ROLE_...')")` a nivel de método REST.
+
+### Pantalla de Inicio de Sesión (Login POS)
+![Pantalla de Login](assets/images/medizano-login.png)
+
+---
+
 ## 📸 Galería Visual de Evidencias en Vivo
 
 ### 1. Sistema Web POS Farmacéutico (Frontend Angular 17 sobre Nginx)
@@ -121,15 +148,17 @@ Interfaz completa de dispensación, búsqueda de medicamentos por código de bar
 
 ---
 
-### 2. Service Discovery (Netflix Eureka Server)
+### 2. Service Discovery Dinámico (Netflix Eureka Server)
 Las 8 instancias de microservicios registradas dinámicamente con sus IPs y puertos internos:
 ![Eureka Discovery](assets/images/eureka-discovery.png)
+![Instancias Eureka](assets/images/eureka-instances.png)
 
 ---
 
 ### 3. Broker Apache Kafka & Consola Kafka UI
-Topics de mensajería asíncrona (`orden-eventos`, `pago-eventos`, `inventario-eventos`, `factura-eventos`) con particiones KRaft:
+Topics de mensajería asíncrona (`orden-eventos`, `pago-eventos`, `inventario-eventos`, `factura-eventos`) con particiones KRaft y métricas de mensajes:
 ![Kafka UI](assets/images/kafka-ui.png)
+![Detalle de Topics Kafka](assets/images/kafka-topics-detail.png)
 
 ---
 
@@ -142,13 +171,20 @@ Tableros de métricas JVM, throughput de peticiones HTTP, estado de base de dato
 ### 5. API Gateway Centralizado & Swagger UI Interactivo
 Punto único perimetral con documentación interactiva OpenAPI 3.0 de todos los microservicios:
 ![Swagger Gateway](assets/images/swagger-gateway.png)
+![Endpoints Swagger](assets/images/swagger-endpoints.png)
 
 ---
 
 ### 6. Servidor de Series Temporales Prometheus
 Scraping continuo de métricas en los endpoints `/actuator/prometheus` de cada contenedor:
 ![Prometheus Server](assets/images/prometheus.png)
+![Prometheus Targets](assets/images/prometheus-targets.png)
 
+---
+
+### 7. Portal de Documentación Oficial de Sustentación (MkDocs Material)
+Sitio web local con el sílabo, arquitectura C4, brief técnico y rúbrica oficial de sustentación:
+![MkDocs Portal](assets/images/mkdocs-exposicion.png)
 ---
 
 ## 🏛️ Arquitectura del Sistema (Diagramas C4)
