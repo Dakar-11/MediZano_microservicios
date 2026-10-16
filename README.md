@@ -147,7 +147,34 @@ Disponible en: **`http://localhost:8000/medizano/`**
 
 ---
 
-## 7. Directorio de Usuarios, Credenciales de Acceso y Matriz RBAC
+## 7. Directorio de Proveedores y Laboratorios Farmacéuticos (DIGEMID)
+
+Gestionado por **`proveedor-ms`** (`:8088` | Base de datos: `medizano_proveedores_db` | Responsable: **Juan Chambilla**), incluye los principales laboratorios farmacéuticos y droguerías con registro sanitario oficial ante DIGEMID:
+
+| RUC | Laboratorio / Proveedor | Registro DIGEMID | Dirección Fiscal | Teléfono | Correo Institucional | Estado |
+| :---: | :--- | :---: | :--- | :---: | :--- | :---: |
+| `20100123456` | **Laboratorios Portugal S.R.L.** | `DIGEMID-LAB-00124` | Av. Manuel Muñoz Najar 412, Arequipa | `054-283920` | `ventas@portugal.pe` | **ACTIVO** |
+| `20100234567` | **Laboratorios Bagó del Perú S.A.** | `DIGEMID-LAB-00215` | Av. Jorge Chávez 154, Miraflores, Lima | `01-2139000` | `contacto@bago.com.pe` | **ACTIVO** |
+| `20100345678` | **Medifarma S.A.** | `DIGEMID-LAB-00089` | Jr. Ecuador 787, Lima Cercado | `01-3304500` | `institucional@medifarma.com.pe` | **ACTIVO** |
+| `20100456789` | **AC Farma S.A.** | `DIGEMID-LAB-00342` | Calle El Retiro 185, Ate, Lima | `01-7195500` | `ventas@acfarma.com` | **ACTIVO** |
+| `20100567890` | **Genfar Perú S.A.** | `DIGEMID-LAB-00411` | Av. Elmer Faucett 345, Callao | `01-5178900` | `atencion@genfar.com.pe` | **ACTIVO** |
+| `20100678901` | **Pfizer S.A.** | `DIGEMID-LAB-00055` | Av. Javier Prado Este 444, San Isidro | `01-6152000` | `pedidos@pfizer.com.pe` | **ACTIVO** |
+| `20100789012` | **Bayer S.A.** | `DIGEMID-LAB-00078` | Av. Paseo de la República 3074, San Isidro | `01-2113800` | `informes@bayer.com.pe` | **ACTIVO** |
+| `20100890123` | **Roemmers S.A.** | `DIGEMID-LAB-00190` | Av. Faustino Sánchez Carrión 465, Magdalena | `01-4620020` | `ventas@roemmers.com.pe` | **ACTIVO** |
+| `20100901234` | **Farmindustria S.A.** | `DIGEMID-LAB-00103` | Calle San Pedro 150, Chorrillos, Lima | `01-6187700` | `contacto@farmindustria.com.pe` | **ACTIVO** |
+| `20101012345` | **Hersil S.A. Laboratorios** | `DIGEMID-LAB-00167` | Av. Los Frutales 220, Ate, Lima | `01-7132000` | `ventas@hersil.com.pe` | **ACTIVO** |
+
+---
+
+## 8. Catálogo Farmacéutico Maestro (200+ Medicamentos y Lotes FEFO)
+
+El sistema cuenta con **203 presentaciones farmacéuticas activas** en `catalogo-ms` y **203 lotes con fecha de caducidad FEFO** en `inventario-ms` con más de **35,500 unidades en stock**:
+* **Categorías terapéuticas:** Analgésicos, Antibióticos, Antiinflamatorios, Antihistamínicos, Antigripales, Gastrointestinales, Cardiovasculares, Vitaminas, Dermatológicos y Respiratorios.
+* **Control FEFO:** El POS reserva automáticamente el lote más próximo a caducar (`quantity_available > 0`) para garantizar la rotación y dispensación segura.
+
+---
+
+## 9. Directorio de Usuarios, Credenciales de Acceso y Matriz RBAC
 
 El sistema cuenta con **7 usuarios pre-cargados** en la base de datos `medizano_usuarios_db` para pruebas y demostración de control de acceso por roles (RBAC):
 

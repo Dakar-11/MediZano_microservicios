@@ -106,10 +106,70 @@ flowchart TD
     * **Tablas implementadas:** `facturas` (serie, correlativo, DNI/RUC, subtotal, IGV 18%, total, hash SUNAT) y `factura_items` (items facturados, descripción, IGV).
     * **Endpoints clave:** `POST /api/v1/facturas`, `GET /api/v1/facturas/{id}/pdf` (Generación de PDF con iText), `GET /api/v1/facturas/reportes/ventas`.
     * **Técnica defensiva:** Desacople por eventos: Al confirmarse el pago en Kafka, emite el comprobante electrónico fiscal con cálculo legal de IGV 18% y PDF descargable en tiempo real.
-* **Microservicio No Transaccional:** `proveedor-ms` (Puerto `:8088` | BD: `medizano_proveedores_db`)
-    * **Tablas implementadas:** `proveedores` (RUC, razón social, laboratorio, registro DIGEMID, teléfono, estado).
-    * **Endpoints clave:** `GET /api/v1/proveedores`, `POST /api/v1/proveedores`.
-* **Qué responder ante el profesor:** *"La facturación no bloquea la compra en caja. Cuando Kafka notifica `pago.validado`, `facturacion-ms` genera la Boleta o Factura electrónica con desglose de IGV oficial y emite el PDF mediante la librería iText"*.
+---
+
+## 🏢 Directorio de Proveedores y Laboratorios Homologados (DIGEMID)
+
+Gestionado por el microservicio **`proveedor-ms`** (Puerto `:8088` | Base de datos: `medizano_proveedores_db` | Responsable: **Juan Chambilla**), este módulo administra el padrón de laboratorios fabricantes y droguerías mayoristas autorizadas por **DIGEMID**:
+
+| N° | RUC | Razón Social | Laboratorio / Marca | Registro DIGEMID | Dirección Fiscal | Teléfono | Correo de Contacto | Estado |
+| :-: | :---: | :--- | :--- | :---: | :--- | :---: | :--- | :---: |
+| **1** | `20100123456` | **LABORATORIOS PORTUGAL S.R.L.** | Portugal | `DIGEMID-LAB-00124` | Av. Manuel Muñoz Najar 412, Arequipa | `054-283920` | `ventas@portugal.pe` | **ACTIVO** |
+| **2** | `20100234567` | **LABORATORIOS BAGO DEL PERU S.A.** | Bagó Perú | `DIGEMID-LAB-00215` | Av. Jorge Chávez 154, Miraflores, Lima | `01-2139000` | `contacto@bago.com.pe` | **ACTIVO** |
+| **3** | `20100345678` | **MEDIFARMA S.A.** | Medifarma | `DIGEMID-LAB-00089` | Jr. Ecuador 787, Lima Cercado | `01-3304500` | `institucional@medifarma.com.pe` | **ACTIVO** |
+| **4** | `20100456789` | **AC FARMA S.A.** | AC Farma | `DIGEMID-LAB-00342` | Calle El Retiro 185, Ate, Lima | `01-7195500` | `ventas@acfarma.com` | **ACTIVO** |
+| **5** | `20100567890` | **GENFAR PERU S.A.** | Genfar | `DIGEMID-LAB-00411` | Av. Elmer Faucett 345, Callao | `01-5178900` | `atencion@genfar.com.pe` | **ACTIVO** |
+| **6** | `20100678901` | **PFIZER S.A.** | Pfizer Perú | `DIGEMID-LAB-00055` | Av. Javier Prado Este 444, San Isidro | `01-6152000` | `pedidos@pfizer.com.pe` | **ACTIVO** |
+| **7** | `20100789012` | **BAYER S.A.** | Bayer | `DIGEMID-LAB-00078` | Av. Paseo de la República 3074, San Isidro | `01-2113800` | `informes@bayer.com.pe` | **ACTIVO** |
+| **8** | `20100890123` | **ROEMMERS S.A.** | Roemmers | `DIGEMID-LAB-00190` | Av. Faustino Sánchez Carrión 465, Magdalena | `01-4620020` | `ventas@roemmers.com.pe` | **ACTIVO** |
+| **9** | `20100901234` | **FARMINDUSTRIA S.A.** | Farmindustria | `DIGEMID-LAB-00103` | Calle San Pedro 150, Chorrillos, Lima | `01-6187700` | `contacto@farmindustria.com.pe` | **ACTIVO** |
+| **10** | `20101012345` | **HERSIL S.A. LABORATORIOS** | Hersil | `DIGEMID-LAB-00167` | Av. Los Frutales 220, Ate, Lima | `01-7132000` | `ventas@hersil.com.pe` | **ACTIVO** |
+| **11** | `20101123456` | **LABORATORIOS LANSIER S.A.C.** | Lansier | `DIGEMID-LAB-00278` | Jr. Paruro 1401, Cercado de Lima | `01-2089200` | `servicio@lansier.com` | **ACTIVO** |
+| **12** | `20101234567` | **QUIMICA SUIZA S.A.C.** | Química Suiza | `DIGEMID-DIS-00034` | Av. República de Panamá 2577, La Victoria | `01-2114000` | `pedidos@quimicasuiza.com` | **ACTIVO** |
+| **13** | `20101345678` | **DROGUERIA LOS ANDES S.A.C.** | Los Andes | `DIGEMID-DIS-00056` | Calle Las Begonias 441, San Isidro | `01-4408900` | `info@losandes.com.pe` | **ACTIVO** |
+| **14** | `20101456789` | **TECNOFARMA S.A.** | Tecnofarma | `DIGEMID-LAB-00389` | Av. El Derby 055, Surco, Lima | `01-6185000` | `contacto@tecnofarma.com.pe` | **ACTIVO** |
+| **15** | `20101567890` | **LABORATORIOS SAVAL S.A.** | Saval Perú | `DIGEMID-LAB-00299` | Av. Canaval y Moreyra 425, San Isidro | `01-2223400` | `ventas@saval.com.pe` | **ACTIVO** |
+
+> **Endpoints REST Implementados:**
+> * `GET /api/v1/proveedores`: Lista de laboratorios activos.
+> * `GET /api/v1/proveedores/ruc/{ruc}`: Búsqueda indexada por RUC.
+> * `POST /api/v1/proveedores`: Registro homologado con validación de registro sanitario DIGEMID.
+
+---
+
+## 💊 Catálogo Farmacéutico Maestro (203 Medicamentos y Lotes FEFO)
+
+Gestionado por **`catalogo-ms`** (`:8081` · Aldo Calla) e **`inventario-ms`** (`:8085` · Aldo Calla), el sistema cuenta con un catálogo industrial de **203 presentaciones farmacológicas activas** respaldadas por **203 lotes FEFO** y más de **35,500 unidades en inventario**:
+
+### Distribución por Categorías Terapéuticas
+| Categoría Farmacéutica | Principales Principios Activos y Medicamentos | Presentaciones | Requiere Receta |
+| :--- | :--- | :--- | :---: |
+| **Analgésicos y Antipiréticos** | Paracetamol, Metamizol (Antalgina), Tramadol, Clonixinato de Lisina, Aspirina | Tabletas 500mg/1g, Jarabes, Gotas, Inyectables | No / Sí (Opioides) |
+| **Antiinflamatorios (AINEs)** | Ibuprofeno, Naproxeno, Diclofenaco Sódico/Potásico, Ketorolaco, Celecoxib, Etoricoxib | 400mg/600mg/800mg, Geles tópicos, Inyectables | No / Sí (Cox-2) |
+| **Antibióticos y Antibacterianos** | Amoxicilina, Amoxicilina + Clavulánico, Azitromicina, Ciprofloxacino, Ceftriaxona, Claritromicina | 500mg/875mg, Suspensiones pediátricas, Frasco Viales | **Sí (Médica OBLIGATORIA)** |
+| **Antihistamínicos y Antialérgicos** | Cetirizina, Loratadina, Desloratadina, Levocetirizina, Clorfenamina, Fexofenadina (Allegra) | Tabletas 10mg, Jarabes 60ml/100ml, Sprays Nasales | No |
+| **Antigripales y Descongestionantes** | Panadol Antigripal (Día/Noche), Nastizol Compositum, Decongel, Afrin, Avamys | Cápsulas Blandas, Tabletas Masticables, Soluciones Nasales | No / Sí |
+| **Gastrointestinales y Antiácidos** | Omeprazol, Esomeprazol, Lansoprazol, Bismutol, Mylanta, Simeticona (Gaseovet), Buscapina | Cápsulas 20mg/40mg, Suspensiones 360ml, Gotas, Grageas | No / Sí |
+| **Cardiovasculares y Antihipertensivos** | Losartán, Enalapril, Amlodipino, Atenolol, Bisoprolol, Atorvastatina, Rosuvastatina, Metformina | Tabletas x 30 días, Dosis 10mg/20mg/50mg/100mg/850mg | **Sí (Crónicos)** |
+| **Vitaminas y Suplementos** | Complejo B, Vitamina C (Redoxon 1g/2g), Vitamina D3, Sulfato Ferroso, Magnesol, Omega 3, Colágeno | Efervescentes, Cápsulas Blandas, Sobres, Polvo | No |
+| **Dermatológicos y Tópicos** | Clotrimazol, Ketoconazol, Betametasona, Mupirocina (Bactroban), Barmicil, Terbinafina | Cremas Dérmicas 20g/30g/50g, Shampoos, Pomadas | No / Sí |
+| **Respiratorios y Broncodilatadores** | Salbutamol, Bromuro de Ipratropio, Budesonida, Fluimucil (Acetilcisteína), Ambroxol | Inhaladores 200 dosis, Soluciones para Nebulizar, Sobres | **Sí (Inhalatoria)** |
+
+### Muestra de Medicamentos de Alta Rotación en Base de Datos
+| ID | Código de Barras | Medicamento | Concentración | Laboratorio | Precio Compra | Precio Venta | Lote FEFO | Stock Disponible | Vencimiento |
+| :-: | :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **1** | `7751234567890` | **Paracetamol** | 500 mg Tableta | Portugal | S/ 2.00 | **S/ 5.00** | `LOT-PAR-2026-001` | **147 un.** | 2028-10-16 |
+| **2** | `7759876543210` | **Amoxicilina** | 500 mg Cápsula | Bagó Perú | S/ 8.00 | **S/ 15.50** | `LOT-AMX-2026-002` | **100 un.** | 2028-10-16 |
+| **3** | `7755554443332` | **Ibuprofeno** | 400 mg Tableta | Genfar | S/ 3.50 | **S/ 8.00** | `LOT-IBU-2026-003` | **120 un.** | 2028-10-16 |
+| **4** | `7752000000000` | **Paracetamol** | 120 mg/5ml Jarabe | Portugal | S/ 1.50 | **S/ 3.50** | `LOT-2026-0004` | **118 un.** | 2027-05-28 |
+| **10** | `7752000000006` | **Diclofenaco Sódico** | 75 mg/3ml Inyectable | AC Farma | S/ 2.75 | **S/ 6.60** | `LOT-2026-0010` | **220 un.** | 2028-11-28 |
+| **25** | `7752000000021` | **Azitromicina** | 500 mg x 3 Tab. | Roemmers | S/ 8.80 | **S/ 22.00** | `LOT-2026-0025` | **175 un.** | 2028-02-28 |
+| **40** | `7752000000036` | **Cetirizina** | 10 mg x 10 Tab. | Medifarma | S/ 2.20 | **S/ 5.50** | `LOT-2026-0040` | **230 un.** | 2027-05-28 |
+| **55** | `7752000000051` | **Omeprazol** | 20 mg x 14 Cáp. | Farmindustria | S/ 2.75 | **S/ 6.60** | `LOT-2026-0055` | **185 un.** | 2028-08-28 |
+| **70** | `7752000000066` | **Losartán Potásico** | 50 mg x 30 Tab. | Hersil | S/ 3.00 | **S/ 8.00** | `LOT-2026-0070` | **190 un.** | 2027-11-28 |
+| **100** | `7752000000096` | **Complejo B** | Tabletas x 100 | Portugal | S/ 8.00 | **S/ 18.00** | `LOT-2026-0100` | **250 un.** | 2027-05-28 |
+| **150** | `7752000000146` | **Metformina** | 850 mg x 30 Tab. | Bayer | S/ 3.60 | **S/ 10.20** | `LOT-2026-0150` | **200 un.** | 2027-07-28 |
+| **200** | `7752000000196` | **Magnesol B6** | Cápsulas x 60 | Farmindustria | S/ 9.90 | **S/ 24.20** | `LOT-2026-0200` | **150 un.** | 2027-09-28 |
 
 ---
 
