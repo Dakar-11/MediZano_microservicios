@@ -143,7 +143,7 @@ sequenceDiagram
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 # 2. Verificar las 8 bases de datos PostgreSQL creadas
-docker exec -it medizano-postgres psql -U medizano_user -d postgres -c "\l"
+docker exec -it medizano-postgres psql -U postgres -d postgres -c "\l"
 
 # 3. Inspeccionar los topics de Kafka directamente en consola
 docker exec -it medizano-kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list

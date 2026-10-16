@@ -16,9 +16,11 @@ Sistema empresarial distribuido de Punto de Venta (POS) y Gestión Farmacéutica
 
 ---
 
-## 🏛️ Arquitectura General del Sistema
+## 🏛️ Repositorio Oficial y Arquitectura del Sistema
 
-![Arquitectura Distribuida MediZano POS](docs/assets/images/arquitectura-medizano.png)
+* 🐙 **Repositorio Oficial en GitHub:** [https://github.com/rbn-69-cod/MediZano_microservicios](https://github.com/rbn-69-cod/MediZano_microservicios)
+
+![Repositorio Oficial y Estructura MediZano POS](docs/assets/images/arquitectura-medizano.png)
 
 ---
 

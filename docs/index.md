@@ -16,9 +16,11 @@ Curso de **Desarrollo de Aplicaciones Distribuidas** (DIST), UPeU 2026-2.
 
 ---
 
-## 🏛️ Diagrama General de Arquitectura
+## 🏛️ Repositorio Oficial y Diagrama de Arquitectura
 
-![Arquitectura Distribuida MediZano POS](assets/images/arquitectura-medizano.png)
+* 🐙 **Repositorio Oficial en GitHub:** [https://github.com/rbn-69-cod/MediZano_microservicios](https://github.com/rbn-69-cod/MediZano_microservicios)
+
+![Repositorio Oficial y Estructura MediZano POS](assets/images/arquitectura-medizano.png)
 
 **MediZano POS** es una plataforma integral de Punto de Venta (POS) y Gestión Farmacéutica construida bajo una **arquitectura distribuida de microservicios nativa de la nube**, contenerizada con Docker, descubrimiento dinámico con Eureka, seguridad reactiva perimetral y distribuida con JWT / Keycloak, frontend en Angular 17 sobre Nginx, mensajería asíncrona con Apache Kafka, consistencia mediante Saga Coreografiada y observabilidad completa con Actuator, Micrometer, Prometheus, Loki y Grafana.
 
