@@ -151,3 +151,4 @@ docker exec -it medizano-kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server
 # 4. Probar la salud de un microservicio a través del Gateway
 curl -s http://localhost:8090/actuator/health | jq .
 ```
+

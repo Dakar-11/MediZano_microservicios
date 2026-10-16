@@ -82,15 +82,17 @@ services:
       - eureka-server
     environment:
       SERVER_PORT: 8090
+      EUREKA_URI: http://eureka-server:8761/eureka/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET es obligatorio}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx200m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8090/actuator/health | grep -q 'UP' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 20s
+      start_period: 90s
     networks:
       - medizano-net
 
@@ -115,16 +117,18 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/medizano_usuarios_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      EUREKA_URI: http://eureka-server:8761/eureka/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET es obligatorio}
       MEDIZANO_DEFAULT_PASSWORD: ${MEDIZANO_DEFAULT_PASSWORD:?MEDIZANO_DEFAULT_PASSWORD es obligatorio}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx200m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8087/actuator/health | grep -q 'UP' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 25s
+      start_period: 90s
     networks:
       - medizano-net
 
@@ -145,14 +149,16 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/medizano_catalogo_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      EUREKA_URI: http://eureka-server:8761/eureka/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx200m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8081/actuator/health | grep -q 'UP' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 25s
+      start_period: 90s
     networks:
       - medizano-net
 
@@ -173,14 +179,16 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/medizano_clientes_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      EUREKA_URI: http://eureka-server:8761/eureka/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx200m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8084/actuator/health | grep -q 'UP' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 25s
+      start_period: 90s
     networks:
       - medizano-net
 
@@ -201,15 +209,17 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/medizano_ordenes_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      EUREKA_URI: http://eureka-server:8761/eureka/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN es obligatorio}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx200m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8082/actuator/health | grep -q 'UP' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 25s
+      start_period: 90s
     networks:
       - medizano-net
 
@@ -230,15 +240,17 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/medizano_inventario_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      EUREKA_URI: http://eureka-server:8761/eureka/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN es obligatorio}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx200m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8085/actuator/health | grep -q 'UP' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 25s
+      start_period: 90s
     networks:
       - medizano-net
 
@@ -259,6 +271,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/medizano_pagos_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      EUREKA_URI: http://eureka-server:8761/eureka/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN es obligatorio}
@@ -274,12 +287,13 @@ services:
       MERCADOPAGO_CURRENCY: ${MERCADOPAGO_CURRENCY:-PEN}
       MERCADOPAGO_WEBHOOK_SECRET: ${MERCADOPAGO_WEBHOOK_SECRET:-webhook_secret_placeholder}
       MERCADOPAGO_CHECKOUT_BASE_URL: ${APP_BASE_URL:-http://localhost:4200}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx200m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8083/actuator/health | grep -q 'UP' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 25s
+      start_period: 90s
     networks:
       - medizano-net
 
@@ -300,15 +314,17 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/medizano_facturacion_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      EUREKA_URI: http://eureka-server:8761/eureka/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN es obligatorio}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx200m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8086/actuator/health | grep -q 'UP' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 25s
+      start_period: 90s
     networks:
       - medizano-net
 
@@ -329,14 +345,16 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/medizano_proveedores_db
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      EUREKA_URI: http://eureka-server:8761/eureka/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx200m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:8088/actuator/health | grep -q 'UP' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 25s
+      start_period: 90s
     networks:
       - medizano-net
 

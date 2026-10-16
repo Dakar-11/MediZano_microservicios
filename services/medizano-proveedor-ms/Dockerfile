@@ -1,23 +1,8 @@
-FROM maven:3.9-eclipse-temurin-17 AS builder
+FROM eclipse-temurin:17-jre-jammy
+RUN apt-get update && apt-get install -y --no-install-recommends wget curl && rm -rf /var/lib/apt/lists/*
+RUN useradd --system --uid 10001 medizano
 WORKDIR /app
-COPY pom.xml ./pom.xml
-COPY config-server ./config-server
-COPY eureka-server ./eureka-server
-COPY api-gateway ./api-gateway
-COPY catalogo-ms ./catalogo-ms
-COPY cliente-ms ./cliente-ms
-COPY orden-ms ./orden-ms
-COPY inventario-ms ./inventario-ms
-COPY pago-ms ./pago-ms
-COPY facturacion-ms ./facturacion-ms
-COPY usuario-ms ./usuario-ms
-COPY proveedor-ms ./proveedor-ms
-RUN mvn clean package -pl proveedor-ms -am -DskipTests
-
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
-RUN apk add --no-cache curl
-COPY --from=builder /app/proveedor-ms/target/*.jar app.jar
+COPY services/medizano-proveedor-ms/target/*.jar app.jar
+USER medizano
 EXPOSE 8088
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
