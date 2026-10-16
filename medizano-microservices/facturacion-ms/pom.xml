@@ -14,7 +14,7 @@
     
     <artifactId>facturacion-ms</artifactId>
     <name>MediZano Facturacion Microservice</name>
-    <description>Microservicio transaccional de Facturación Electrónica y Comprobantes PDF (Rubén)</description>
+    <description>Microservicio transaccional de Facturación Electrónica SUNAT y Comprobantes (Juan Chambilla)</description>
     
     <dependencies>
         <dependency>

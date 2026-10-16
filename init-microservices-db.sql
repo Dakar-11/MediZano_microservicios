@@ -1,8 +1,9 @@
--- Bases de datos independientes para los microservicios de MediZano POS
-CREATE DATABASE medizano_catalogo_db;
-CREATE DATABASE medizano_clientes_db;
-CREATE DATABASE medizano_ordenes_db;
-CREATE DATABASE medizano_inventario_db;
-CREATE DATABASE medizano_pagos_db;
-CREATE DATABASE medizano_facturacion_db;
-CREATE DATABASE medizano_usuarios_db;
+-- Bases de datos independientes para los 8 microservicios de MediZano POS (4 Integrantes x 2 MS)
+CREATE DATABASE medizano_catalogo_db;     -- Integrante 1 (No Transaccional)
+CREATE DATABASE medizano_ordenes_db;      -- Integrante 1 (Transaccional)
+CREATE DATABASE medizano_clientes_db;     -- Integrante 2 (No Transaccional)
+CREATE DATABASE medizano_pagos_db;        -- Integrante 2 (Transaccional)
+CREATE DATABASE medizano_usuarios_db;     -- Integrante 3 (No Transaccional)
+CREATE DATABASE medizano_facturacion_db;  -- Integrante 3 (Transaccional)
+CREATE DATABASE medizano_proveedores_db;  -- Integrante 4 (No Transaccional)
+CREATE DATABASE medizano_inventario_db;   -- Integrante 4 (Transaccional)

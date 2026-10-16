@@ -30,6 +30,7 @@
         <module>pago-ms</module>
         <module>facturacion-ms</module>
         <module>usuario-ms</module>
+        <module>proveedor-ms</module>
     </modules>
     
     <properties>

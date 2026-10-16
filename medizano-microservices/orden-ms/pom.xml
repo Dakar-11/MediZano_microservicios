@@ -14,7 +14,7 @@
     
     <artifactId>orden-ms</artifactId>
     <name>MediZano Orden Microservice</name>
-    <description>Microservicio transaccional de Órdenes y Pedidos (Kenyi)</description>
+    <description>Microservicio transaccional de Órdenes y Pedidos POS (Kenyi Calsin)</description>
     
     <dependencies>
         <dependency>

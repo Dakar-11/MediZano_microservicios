@@ -14,7 +14,7 @@
     
     <artifactId>pago-ms</artifactId>
     <name>MediZano Pago Microservice</name>
-    <description>Microservicio transaccional de Pagos con integración oficial PayPal Sandbox (Rubén)</description>
+    <description>Microservicio transaccional de Pagos con integración oficial PayPal Sandbox y Mercado Pago (Igarlos Mamani)</description>
     
     <dependencies>
         <dependency>

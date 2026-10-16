@@ -14,7 +14,7 @@
     
     <artifactId>usuario-ms</artifactId>
     <name>MediZano Usuario y Autenticacion Microservice</name>
-    <description>Microservicio de Seguridad, Autenticación JWT, Usuarios y Auditoría</description>
+    <description>Microservicio no transaccional de Seguridad, Autenticación JWT, Usuarios y Roles (Igarlos Mamani)</description>
     
     <dependencies>
         <dependency>

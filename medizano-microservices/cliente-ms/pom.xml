@@ -14,7 +14,7 @@
     
     <artifactId>cliente-ms</artifactId>
     <name>MediZano Cliente Microservice</name>
-    <description>Microservicio no transaccional de Gestión de Clientes (Kenyi)</description>
+    <description>Microservicio no transaccional de Gestión de Clientes (Kenyi Calsin)</description>
     
     <dependencies>
         <dependency>

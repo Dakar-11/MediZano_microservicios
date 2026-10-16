@@ -14,7 +14,7 @@
     
     <artifactId>inventario-ms</artifactId>
     <name>MediZano Inventario Microservice</name>
-    <description>Microservicio transaccional de Inventario y Stock (Rubén)</description>
+    <description>Microservicio transaccional de Inventario, Kardex y Lotes (Aldo Calla)</description>
     
     <dependencies>
         <dependency>
